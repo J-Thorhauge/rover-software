@@ -23,6 +23,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            'gstreamer_node = gorm_sensors.gstreamer_node:main'
         ],
     },
 )
