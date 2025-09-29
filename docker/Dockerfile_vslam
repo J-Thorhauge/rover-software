@@ -1,0 +1,50 @@
+FROM ros:humble
+
+ARG ROS_DISTRO=humble
+ARG BASE_FOLDER=/root/orin
+ARG ROS_WORKSPACE_NAME=VSLAM-WS
+
+WORKDIR ${BASE_FOLDER}/${ROS_WORKSPACE_NAME}
+
+RUN apt-get update && \
+    apt-get install -y \
+        build-essential \
+        cmake \
+        git \
+        libgtk2.0-dev \
+        pkg-config \
+        libavcodec-dev \
+        libavformat-dev \
+        libswscale-dev \
+        libtbb-dev \
+        libjpeg-dev \
+        libpng-dev \
+        libtiff-dev \
+        libdc1394-dev \
+        python3-dev \
+        unzip \
+        wget && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update && \ 
+    apt install ros-${ROS_DISTRO}-rtabmap-ros -y && \
+    apt-get install ros-${ROS_DISTRO}-stereo-image-proc -y && \
+    rm -rf /var/lib/apt/lists/*
+
+
+COPY src/rover/gorm_vslam src/
+
+RUN apt-get update && \
+    rosdep update && \
+    rosdep install --from-paths src --ignore-src -r -y && \
+    rm -rf /var/lib/apt/lists/*
+RUN /bin/bash -c "source /opt/ros/${ROS_DISTRO}/setup.bash && \
+colcon build --parallel-workers $(nproc) --symlink-install \
+    --event-handlers console_direct+ --base-paths src \
+    --packages-select gorm_vslam \
+    --cmake-args \
+        ' -DCMAKE_BUILD_TYPE=Release' \
+        ' --no-warn-unused-cli'"
+
+
+ENTRYPOINT ["/bin/bash", "-c", "source /opt/ros/humble/setup.bash && bash"] 
