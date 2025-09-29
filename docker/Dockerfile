@@ -186,7 +186,7 @@ RUN pip3 install tritonclient[all]
 ###         Install EXTRAS       ###
 #####################################
 
-RUN apt-get update && apt-get install -y ros-humble-rosbridge-server
+RUN apt-get update && apt-get install -y ros-humble-rosbridge-server ros-humble-rmw-zenoh-cpp
 
 # Clean up
 RUN rm -rf /var/lib/apt/lists/*
@@ -232,7 +232,8 @@ RUN /bin/bash -c "apt-get update && \
 # Build the rover software
 RUN /bin/bash -c "source /opt/ros/humble/setup.bash && \
     source ${ROS2_WRAPPER_FOLDER}/install/setup.bash && \
-    colcon build --parallel-workers $(nproc) \
+    colcon build --packages-ignore interfaces probe_detection \ 
+    --parallel-workers $(nproc) \
     --event-handlers console_direct+ \
     --cmake-args ' -DCMAKE_BUILD_TYPE=Release' \
     ' --no-warn-unused-cli'"

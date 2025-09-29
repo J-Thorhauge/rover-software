@@ -1,0 +1,51 @@
+# Use the updated base image
+FROM erc-mars-rover_base:latest
+
+ARG ROS_DISTRO=humble
+ARG BASE_FOLDER=/root/orin
+ARG ROS_WORKSPACE_NAME=ERC-Mars-Rover
+
+WORKDIR ${BASE_FOLDER}/${ROS_WORKSPACE_NAME}
+
+# - - - - Install system wide packages - - - - 
+# Install Nav2
+RUN apt-get update && \
+    /bin/bash -c "source /opt/ros/${ROS_DISTRO}/setup.bash && \
+    apt-get install -y \
+    ros-${ROS_DISTRO}-navigation2 \
+    ros-${ROS_DISTRO}-nav2-bringup \
+    ros-${ROS_DISTRO}-vector-pursuit-controller" && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install RTAB MAP
+RUN apt-get update && \ 
+    apt install ros-$ROS_DISTRO-rtabmap-ros -y && \
+    rm -rf /var/lib/apt/lists/*
+
+
+
+# - - - - Install Workspace specific packages - - - -
+COPY ../src/ src/
+
+RUN cp ${BASE_FOLDER}/${ROS_WORKSPACE_NAME}/src/navigation/config/nav2_params.yaml /opt/ros/humble/share/nav2_bringup/params/nav2_params.yaml && \
+    cp ${BASE_FOLDER}/${ROS_WORKSPACE_NAME}/src/navigation/config/navigation_launch.py /opt/ros/humble/share/nav2_bringup/launch/navigation_launch.py && \
+    cp ${BASE_FOLDER}/${ROS_WORKSPACE_NAME}/src/navigation/config/navigate_to_pose_w_replanning_and_recovery.xml /opt/ros/humble/share/nav2_bt_navigator/behavior_trees/navigate_to_pose_w_replanning_and_recovery.xml
+RUN find src/ -path "*/scripts/*" -type f -exec chmod +x {} \;
+
+
+
+# Set LD_LIBRARY_PATH for runtime
+ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib
+
+
+
+RUN /bin/bash -c "source /opt/ros/${ROS_DISTRO}/setup.bash && \
+    colcon build --parallel-workers $(nproc) --symlink-install \
+        --event-handlers console_direct+ --base-paths src \
+        --packages-skip gcs\
+        --cmake-args \
+            ' -DCMAKE_BUILD_TYPE=Release' \
+            ' -DCMAKE_CXX_FLAGS=\"-Wl,--allow-shlib-undefined\"' \
+            ' --no-warn-unused-cli'"
+
+ENTRYPOINT ["/bin/bash", "-c", "source ${BASE_FOLDER}/${ROS_WORKSPACE_NAME}/install/setup.bash && exec \"$@\"", "bash"]
