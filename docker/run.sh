@@ -49,7 +49,7 @@ SERVICE_NAME="$1"
 shift # Consume the service name argument
 MODE=""
 TRITON=false
-ZENOH=false
+ZENOH=true
 SERVICES=""
 
 # Handle standalone services that don't require a mode
@@ -83,7 +83,7 @@ case $1 in
         ;;
     --prod)
         MODE="prod"
-        SERVICES="$SERVICE_NAME-deploy perception_container" # In prod, service has '-deploy' suffix
+        SERVICES="$SERVICE_NAME-deploy" # In prod, service has '-deploy' suffix
         shift
         ;;
     *)
@@ -101,7 +101,7 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         --zenoh|-z)
-            ZENOH=true
+            ZENOH=false
             shift
             ;;
         *)

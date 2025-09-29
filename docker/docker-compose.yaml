@@ -1,4 +1,8 @@
 services:
+
+###################################
+###           Rover             ###
+###################################
   rover:
     build:
       context: .
@@ -37,67 +41,6 @@ services:
       - /dev/video1:/dev/video1
       - /dev/video2:/dev/video2
       - /dev/video3:/dev/video3
-
-  cameras-deploy:
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile
-      target: production
-      args:
-        L4T_VERSION_MAJOR: 36 # jetpack version 36.4.0 
-        L4T_VERSION_MINOR: 4
-        L4T_VERSION_PATCH: 0
-        ZED_SDK_MAJOR: 5 # ZED SDK version 5.0.3
-        ZED_SDK_MINOR: 0
-        ZED_SDK_PATCH: 3
-        ROS2_WRAPPER_FOLDER: /home/ros2_ws
-        ZED_ROS2_WRAPPER_BRANCH: master
-        ZED_ROS2_WRAPPER_URL: https://github.com/stereolabs/zed-ros2-wrapper.git
-    container_name: rover-cameras
-    volumes:
-      - ../src:/home/workspace/src
-      - /tmp/argus_socket:/tmp/argus_socket
-      - /lib/modules/5.15.148-tegra:/lib/modules/5.15.148-tegra
-      - /dev/:/dev/
-      - /usr/local/zed/resources/:/usr/local/zed/resources/
-      - /tmp/.X11-unix/:/tmp/.X11-unix
-      - /dev/shm:/dev/shm
-    working_dir: /home/workspace
-    stdin_open: true
-    tty: true
-    environment:
-      - ROS_DOMAIN_ID=50
-      - RMW_IMPLEMENTATION=rmw_zenoh_cpp
-      # - RMW_IMPLEMENTATION=rmw_fastrtps_cpp - default dds implementation, however fucks the networking when using cameras
-    network_mode: host
-    privileged: true
-    runtime: nvidia
-    restart: unless-stopped
-    devices:
-      - /dev:/dev
-      - /dev/video0:/dev/video0
-      - /dev/video1:/dev/video1
-      - /dev/video2:/dev/video2
-      - /dev/video3:/dev/video3
-    entrypoint: ["/bin/bash"]
-    command: ["-c", "source /opt/ros/humble/setup.bash && source /home/workspace/install/setup.bash && ros2 launch gorm_sensors cameras.launch.py"]
-  
-  zenoh-router:
-    image: eclipse/zenoh
-    container_name: zenoh-router
-    network_mode: host
-    ports:
-      - "7447:7447"
-      - "7448:7448"
-      - "8000:8000"
-    # Update the filename in the command
-    command: ["--config", "/etc/zenoh/zenoh-router.json"]
-    volumes:
-      # Update the filename in the volume mount
-      - ./zenoh_docker/zenoh-router.json:/etc/zenoh/zenoh-router.json
-    restart: unless-stopped
-    environment:
-      - RUST_LOG=debug
 
   rover-deploy:
     build:
@@ -139,29 +82,78 @@ services:
     command: ["autostart"]
 
 
-  
-  perception_container:
-    image: erc-mars-rover_perception:latest
-    container_name: perception_container
-    runtime: nvidia
-    privileged: true
-    network_mode: host
+###################################
+###         Cameras             ###
+###################################
+
+  cameras-deploy:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: production
+      args:
+        L4T_VERSION_MAJOR: 36 # jetpack version 36.4.0 
+        L4T_VERSION_MINOR: 4
+        L4T_VERSION_PATCH: 0
+        ZED_SDK_MAJOR: 5 # ZED SDK version 5.0.3
+        ZED_SDK_MINOR: 0
+        ZED_SDK_PATCH: 3
+        ROS2_WRAPPER_FOLDER: /home/ros2_ws
+        ZED_ROS2_WRAPPER_BRANCH: master
+        ZED_ROS2_WRAPPER_URL: https://github.com/stereolabs/zed-ros2-wrapper.git
+    container_name: rover-cameras
     volumes:
-      - /lib/modules/$(uname -r):/lib/modules/$(uname -r)
-      - /run/nvargus:/run/nvargus
+      - ../src:/home/workspace/src
       - /tmp/argus_socket:/tmp/argus_socket
+      - /lib/modules/5.15.148-tegra:/lib/modules/5.15.148-tegra
+      - /dev/:/dev/
+      - /usr/local/zed/resources/:/usr/local/zed/resources/
+      - /tmp/.X11-unix/:/tmp/.X11-unix
+      - /dev/shm:/dev/shm
+    working_dir: /home/workspace
+    stdin_open: true
+    tty: true
+    environment:
+      - ROS_DOMAIN_ID=0
+      - RMW_IMPLEMENTATION=rmw_zenoh_cpp
+      # - RMW_IMPLEMENTATION=rmw_fastrtps_cpp - default dds implementation, however fucks the networking when using cameras
+    network_mode: host
+    privileged: true
+    runtime: nvidia
+    restart: unless-stopped
     devices:
       - /dev:/dev
       - /dev/video0:/dev/video0
       - /dev/video1:/dev/video1
       - /dev/video2:/dev/video2
       - /dev/video3:/dev/video3
-    entrypoint: /bin/bash
-    # command: -c "source install/setup.bash && ros2 run probe_detection detect_probe.py > /dev/null 2>&1"
-    command: -c "source install/setup.bash && ros2 launch slam rtab.launch.py"
-    depends_on:
-      - cameras-deploy
+    entrypoint: ["/bin/bash"]
+    command: ["-c", "source /opt/ros/humble/setup.bash && source /home/workspace/install/setup.bash && ros2 launch gorm_sensors cameras.launch.py"]
   
+
+
+###################################
+###           Routing           ###
+###################################
+
+
+  zenoh-router:
+    image: eclipse/zenoh
+    container_name: zenoh-router
+    network_mode: host
+    ports:
+      - "7447:7447"
+      - "7448:7448"
+      - "8000:8000"
+    # Update the filename in the command
+    command: ["--config", "/etc/zenoh/zenoh-router.json"]
+    volumes:
+      # Update the filename in the volume mount
+      - ./zenoh_docker/zenoh-router.json:/etc/zenoh/zenoh-router.json
+    restart: unless-stopped
+    environment:
+      - RUST_LOG=debug
+
 
   triton-server:
     image: nvcr.io/nvidia/tritonserver:23.02-py3
@@ -176,3 +168,30 @@ services:
     command: tritonserver --model-repository=/models
     runtime: nvidia
     privileged: true
+
+
+
+## --------------------------------------------------------  FOR LATER DEV MAYBE ----------------------------------------------_## hehe
+
+  # perception_container:
+  #   image: erc-mars-rover_perception:latest
+  #   container_name: perception_container
+  #   runtime: nvidia
+  #   privileged: true
+  #   network_mode: host
+  #   volumes:
+  #     - /lib/modules/$(uname -r):/lib/modules/$(uname -r)
+  #     - /run/nvargus:/run/nvargus
+  #     - /tmp/argus_socket:/tmp/argus_socket
+  #   devices:
+  #     - /dev:/dev
+  #     - /dev/video0:/dev/video0
+  #     - /dev/video1:/dev/video1
+  #     - /dev/video2:/dev/video2
+  #     - /dev/video3:/dev/video3
+  #   entrypoint: /bin/bash
+  #   # command: -c "source install/setup.bash && ros2 run probe_detection detect_probe.py > /dev/null 2>&1"
+  #   command: -c "source install/setup.bash && ros2 launch slam rtab.launch.py"
+  #   depends_on:
+  #     - cameras-deploy
+  
