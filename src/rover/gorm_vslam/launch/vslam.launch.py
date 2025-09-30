@@ -51,7 +51,7 @@ def generate_launch_description():
             'camera_info_topic': '/zed_front/zed/rgb_gray/camera_info',
             'depth_camera_info_topic': '/zed_front/zed/depth/camera_info',
             'imu_topic': '/zed_front/zed/imu/data',
-            'frame_id': 'zed_front_base_link',
+            'frame_id': 'base_link',
             'approx_sync': 'true',
             'wait_imu_to_init': 'true'
         }.items()
