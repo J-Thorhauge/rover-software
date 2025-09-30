@@ -28,6 +28,16 @@ def generate_launch_description():
         arguments=['0', '0', '0', '0', '0', '0', 'zed_imu_link', 'zed_front_base_link'],#x value differs from the report, but was experimentet to match better with this value.
         output='screen'  # Ensure logs are visible
     )
+
+    static_transform_publisher_foptical = Node(
+        package='tf2_ros',
+        namespace='tf2',
+        name='zed_to_base_tf',
+        executable='static_transform_publisher',
+        arguments=['0', '0', '0', '0', '0', '0', 'zed_front_base_link', 'zed_front_left_camera_optical_frame'],#x value differs from the report, but was experimentet to match better with this value.
+        output='screen'  # Ensure logs are visible
+    )
+
   
     rtabmap_launch_dir = FindPackageShare('rtabmap_launch').find('rtabmap_launch')
 
@@ -66,5 +76,6 @@ def generate_launch_description():
         rtabmap_launch,
         static_transform_publisher_fcam,
         static_transform_publisher_fimu,
+        static_transform_publisher_foptical,
         delayed_actions    # Launch dependent nodes after a delay
     ])
