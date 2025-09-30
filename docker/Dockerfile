@@ -209,6 +209,35 @@ ENTRYPOINT ["/entrypoint.sh"]
 
 FROM base AS production
 
+
+## ADD the vslam:
+
+RUN apt-get update && \
+    apt-get install -y \
+        build-essential \
+        cmake \
+        git \
+        libgtk2.0-dev \
+        pkg-config \
+        libavcodec-dev \
+        libavformat-dev \
+        libswscale-dev \
+        libtbb-dev \
+        libjpeg-dev \
+        libpng-dev \
+        libtiff-dev \
+        libdc1394-dev \
+        python3-dev \
+        unzip \
+        wget && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update && \ 
+    apt install ros-humble-rtabmap-ros -y && \
+    apt-get install ros-humble-stereo-image-proc -y && \
+    rm -rf /var/lib/apt/lists/*
+
+
 ###################################
 ###    Copy and Build Rover SW   ###
 ###################################
