@@ -34,3 +34,14 @@ ros2 bag record -a
 
 ## Common issues 
 
+### Discovering topics but cant get data 
+
+```yaml
+- ./config/fastrtps-profiles.xml:/home/workspace/fastrtps-profiles.xml
+```
+
+Then Ensure that this line is present in the environement of the docker compose file for the specific image you are building:
+```yaml
+- FASTRTPS_DEFAULT_PROFILES_FILE=/home/workspace/fastrtps-profiles.xml
+```
+
