@@ -37,7 +37,23 @@ def generate_launch_description():
     #     arguments=['0', '0', '0', '0', '0', '0', 'zed_front_base_link', 'zed_front_left_camera_optical_frame'],#x value differs from the report, but was experimentet to match better with this value.
     #     output='screen'  # Ensure logs are visible
     # )
-
+    # sync_node = Node(
+    #         package='rtabmap_sync',
+    #         executable='rgbd_sync',
+    #         name='rgbd_sync',
+    #         output='screen',
+    #         parameters=[{
+    #             'compressed': 'true',
+    #             'approx_sync': True,   # Set to False if using exact sync
+    #             'queue_size': 10
+    #         }],
+    #         remappings=[
+    #             ('rgb/image', '/zed_front/zed/rgb_gray/image_rect_gray/compressed'),
+    #             ('depth/image', '/zed_front/zed/depth/depth_registered/compressedDepth'),
+    #             ('rgb/camera_info', '/zed_front/zed/rgb_gray/camera_info'),
+    #             ('rgbd_image', 'rtabmap/rgbd_image')
+    #         ]
+    #     )
   
     rtabmap_launch_dir = FindPackageShare('rtabmap_launch').find('rtabmap_launch')
 
@@ -46,14 +62,22 @@ def generate_launch_description():
             os.path.join(rtabmap_launch_dir, 'launch', 'rtabmap.launch.py')
         ),
         launch_arguments={
+            'compressed': 'true',
+            'rtabmap_args': "--delete_db_on_start ",
             'rgb_topic': '/zed_front/zed/rgb_gray/image_rect_gray',
             'depth_topic': '/zed_front/zed/depth/depth_registered',
             'camera_info_topic': '/zed_front/zed/rgb_gray/camera_info',
-            'depth_camera_info_topic': '/zed_front/zed/depth/camera_info',
-            'imu_topic': '/zed_front/zed/imu/data',
+            #'subscribe_rgbd': 'true',    # to be used if using the sync node 
             'frame_id': 'zed_camera_link',
             'approx_sync': 'true',
-            'wait_imu_to_init': 'true'
+            'use_sim_time': 'true',
+            #'wait_imu_to_init': 'true',
+            #'imu_topic' :'/zed/zed_node/imu/data',
+            'qos': '1',
+            'topic_queue_size': '100',
+            'sync_queue_size': '300',
+            'rviz':'true', 
+            'rtabmap_viz': 'true'
         }.items()
     )
 
@@ -72,7 +96,7 @@ def generate_launch_description():
         DeclareLaunchArgument('rtabmap_viz',  default_value='false',  description='Launch RTAB-Map UI (optional).'),
         DeclareLaunchArgument('rviz',         default_value='false',   description='Launch RVIZ (optional).'),
         DeclareLaunchArgument('localization', default_value='false',  description='Launch in localization mode.'),
-        
+        #sync_node,
         rtabmap_launch,
         # static_transform_publisher_fcam,
         # static_transform_publisher_fimu,

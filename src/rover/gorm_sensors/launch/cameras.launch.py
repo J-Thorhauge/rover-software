@@ -42,6 +42,7 @@ def generate_launch_description():
             'grab_resolution': 'HD1080', # 'VGA',  # The native camera grab resolution. 'HD2K', 'HD1080', 'HD720', 'VGA', 'AUTO'
             'pos_tracking': 'false',  # Enable positional tracking
             'publish_tf': 'true',  # Publish TF for the camera
+            'publish_imu_tf': 'true'
             'publish_map_tf': 'false',  # Publish map TF for the camera
             'namespace': 'zed_front',  # Namespace for the camera node
         }.items()
