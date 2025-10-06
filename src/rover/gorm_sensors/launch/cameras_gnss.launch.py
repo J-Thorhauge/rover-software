@@ -6,6 +6,7 @@ from launch_ros.substitutions import FindPackageShare
 import os
 from ament_index_python.packages import get_package_share_directory
 from launch.actions import DeclareLaunchArgument
+from launch.actions import TimerAction
 from launch.substitutions import LaunchConfiguration, Command
 
 def generate_launch_description():
@@ -24,7 +25,7 @@ def generate_launch_description():
                     'camera_id': '0',
                     'node_name': 'zed_tracking',
                     'grab_resolution': 'HD1080',
-                    'gnss_fusion_enabled': 'false',
+                    'gnss_fusion_enabled': 'true',
                     'namespace': 'zed_tracking',
                     'initial_base_pose': '[0.28, 0.0, 0.225, 0.0, 0.0, 0.0]',
                     'pos_tracking': 'true',
@@ -46,6 +47,7 @@ def generate_launch_description():
             'camera_id': '1',
             'node_name': 'zed_front',
             'grab_resolution': 'HD1080', # 'VGA',  # The native camera grab resolution. 'HD2K', 'HD1080', 'HD720', 'VGA', 'AUTO'
+            'gnss_fusion_enabled': 'true',
             'pos_tracking': 'false',  # Enable positional tracking
             'publish_tf': 'false',  # Publish TF for the camera
             'publish_imu_tf': 'true',
@@ -69,7 +71,7 @@ def generate_launch_description():
     )
 
     params_file = os.path.join(
-        get_package_share_directory('tess_sensors'),
+        get_package_share_directory('gorm_sensors'),
         'config',
         'zed_f9p.yaml'
     )
