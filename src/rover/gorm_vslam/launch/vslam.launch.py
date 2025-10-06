@@ -11,50 +11,14 @@ from ament_index_python.packages import get_package_share_directory
 def generate_launch_description():
     
     
-    # static_transform_publisher_fcam = Node(
-    #     package='tf2_ros',
-    #     namespace='tf2',
-    #     name='camera_to_base_link_transform',
-    #     executable='static_transform_publisher',
-    #     arguments=['-0.147499', '-0.0598990', '-0.238857', '0', '-0.34906585', '0', 'zed_front_base_link', 'base_link'],#x value differs from the report, but was experimentet to match better with this value.
-    #     output='screen'  # Ensure logs are visible
-    # )
-    
-    # static_transform_publisher_fimu = Node(
-    #     package='tf2_ros',
-    #     namespace='tf2',
-    #     name='camera_to_base_link_transform',
-    #     executable='static_transform_publisher',
-    #     arguments=['0', '0', '0', '0', '0', '0', 'zed_imu_link', 'zed_front_base_link'],#x value differs from the report, but was experimentet to match better with this value.
-    #     output='screen'  # Ensure logs are visible
-    # )
+    camera_rotation_tf = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='static_tf_rotation_base_to_camera',
+        # Format: x y z roll pitch yaw frame_id child_frame_id
+        arguments=['0', '0', '0', '0', '-0.2618', '0', 'base_link', 'zed_camera_link'],
+    )
 
-    # static_transform_publisher_foptical = Node(
-    #     package='tf2_ros',
-    #     namespace='tf2',
-    #     name='zed_to_base_tf',
-    #     executable='static_transform_publisher',
-    #     arguments=['0', '0', '0', '0', '0', '0', 'zed_front_base_link', 'zed_front_left_camera_optical_frame'],#x value differs from the report, but was experimentet to match better with this value.
-    #     output='screen'  # Ensure logs are visible
-    # )
-    # sync_node = Node(
-    #         package='rtabmap_sync',
-    #         executable='rgbd_sync',
-    #         name='rgbd_sync',
-    #         output='screen',
-    #         parameters=[{
-    #             'compressed': 'true',
-    #             'approx_sync': True,   # Set to False if using exact sync
-    #             'queue_size': 10
-    #         }],
-    #         remappings=[
-    #             ('rgb/image', '/zed_front/zed/rgb_gray/image_rect_gray/compressed'),
-    #             ('depth/image', '/zed_front/zed/depth/depth_registered/compressedDepth'),
-    #             ('rgb/camera_info', '/zed_front/zed/rgb_gray/camera_info'),
-    #             ('rgbd_image', 'rtabmap/rgbd_image')
-    #         ]
-    #     )
-  
     rtabmap_launch_dir = FindPackageShare('rtabmap_launch').find('rtabmap_launch')
 
     rtabmap_launch = IncludeLaunchDescription(
@@ -98,6 +62,7 @@ def generate_launch_description():
         DeclareLaunchArgument('localization', default_value='false',  description='Launch in localization mode.'),
         #sync_node,
         rtabmap_launch,
+        camera_rotation_tf,
         # static_transform_publisher_fcam,
         # static_transform_publisher_fimu,
         # static_transform_publisher_foptical,

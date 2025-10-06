@@ -59,7 +59,7 @@ def generate_launch_description():
         package='tf2_ros',
         executable='static_transform_publisher',
         name='static_transform_publisher_zed_base',
-        arguments=['-0.28', '0.0', '-0.225', '0.0', '-0.2618', '0.0', 'zed_camera_link', 'base_link'],
+        arguments=['-0.28', '0.0', '-0.225', '0.0', '0.0', '0.0', 'zed_camera_link', 'base_link'],
     )
 
     camera_pose = Node(
