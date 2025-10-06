@@ -11,13 +11,13 @@ from ament_index_python.packages import get_package_share_directory
 def generate_launch_description():
     
     
-    camera_rotation_tf = Node(
-        package='tf2_ros',
-        executable='static_transform_publisher',
-        name='static_tf_rotation_base_to_camera',
-        # Format: x y z roll pitch yaw frame_id child_frame_id
-        arguments=['0', '0', '0', '0', '-0.2618', '0', 'base_link', 'zed_camera_link'],
-    )
+    # camera_rotation_tf = Node(
+    #     package='tf2_ros',
+    #     executable='static_transform_publisher',
+    #     name='static_tf_rotation_base_to_camera',
+    #     # Format: x y z roll pitch yaw frame_id child_frame_id
+    #     arguments=['0', '0', '0', '0', '-0.2618', '0', 'base_link', 'zed_camera_link'],
+    # )
 
     rtabmap_launch_dir = FindPackageShare('rtabmap_launch').find('rtabmap_launch')
 
@@ -32,7 +32,7 @@ def generate_launch_description():
             'depth_topic': '/zed_front/zed/depth/depth_registered',
             'camera_info_topic': '/zed_front/zed/rgb_gray/camera_info',
             #'subscribe_rgbd': 'true',    # to be used if using the sync node 
-            'frame_id': 'zed_camera_link',
+            'frame_id': 'base_link',
             'approx_sync': 'true',
             'use_sim_time': 'true',
             #'wait_imu_to_init': 'true',
@@ -62,7 +62,7 @@ def generate_launch_description():
         DeclareLaunchArgument('localization', default_value='false',  description='Launch in localization mode.'),
         #sync_node,
         rtabmap_launch,
-        camera_rotation_tf,
+        # camera_rotation_tf,
         # static_transform_publisher_fcam,
         # static_transform_publisher_fimu,
         # static_transform_publisher_foptical,
