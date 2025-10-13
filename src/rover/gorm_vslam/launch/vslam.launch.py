@@ -28,9 +28,9 @@ def generate_launch_description():
         launch_arguments={
             'compressed': 'true',
             'rtabmap_args': "--delete_db_on_start ",
-            'rgb_topic': '/zed_front/zed/rgb_gray/image_rect_gray',
+            'rgb_topic': '/zed_front/zed/rgb/image_rect_color',
             'depth_topic': '/zed_front/zed/depth/depth_registered',
-            'camera_info_topic': '/zed_front/zed/rgb_gray/camera_info',
+            'camera_info_topic': '/zed_front/zed/rgb/camera_info',
             #'subscribe_rgbd': 'true',    # to be used if using the sync node 
             'frame_id': 'base_link',
             'approx_sync': 'true',
