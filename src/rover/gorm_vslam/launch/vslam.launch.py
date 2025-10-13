@@ -1,5 +1,6 @@
 import os
 from launch import LaunchDescription
+from launch_ros.actions import Node
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, LogInfo, TimerAction
 from launch.substitutions import LaunchConfiguration, PythonExpression
 from launch.launch_description_sources import PythonLaunchDescriptionSource
@@ -44,6 +45,23 @@ def generate_launch_description():
         ]
     )
 
+    static_transform = Node(
+    package='tf2_ros',
+    executable='static_transform_publisher',
+    name='tf_map_to_odom',
+    arguments=[
+        '--x', '1.0',        # translation (m)
+        '--y', '0.0',
+        '--z', '0.0',
+        '--yaw', '0.0',      # rotation (radians)
+        '--pitch', '0.0',
+        '--roll', '0.0',
+        '--frame-id', 'map',          # parent frame
+        '--child-frame-id', 'odom'  # child frame
+        ]
+    )
+
+
     return LaunchDescription([
         LogInfo(msg='Starting ZED2i Camera with RTAB-Map VSLAM...'),
 
@@ -78,7 +96,7 @@ def generate_launch_description():
             "'Selected Camera Info topic: ' + '", camera_info_topic, "'"
         ])),
 
-
+        static_transform,
         rtabmap_launch,
         delayed_actions
     ])
