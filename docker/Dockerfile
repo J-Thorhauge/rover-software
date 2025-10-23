@@ -210,7 +210,7 @@ ENTRYPOINT ["/entrypoint.sh"]
 FROM base AS production
 
 
-## ADD the vslam:
+## Installation of rtabmap and nav2 
 
 RUN apt-get update && \
     apt-get install -y \
@@ -235,6 +235,8 @@ RUN apt-get update && \
 RUN apt-get update && \ 
     apt install ros-humble-rtabmap-ros -y && \
     apt-get install ros-humble-stereo-image-proc -y && \
+    apt-get install ros-humble-navigation2 -y &&\
+    apt-get install ros-humble-nav2-bringup -y &&\
     rm -rf /var/lib/apt/lists/*
 
 
