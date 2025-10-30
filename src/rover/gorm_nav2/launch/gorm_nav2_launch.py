@@ -1,9 +1,9 @@
 import os
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch_ros.substitutions import FindPackageShare
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import PathJoinSubstitution
+from launch.substitutions import PathJoinSubstitution, LaunchConfiguration, TextSubstitution
 
 def generate_launch_description():
     # Paths to launch files
@@ -13,19 +13,32 @@ def generate_launch_description():
         'navigation_launch.py'
     )
 
+    yaml_name_arg = DeclareLaunchArgument(
+        'config',
+        default_value='mppi.yaml',
+        description='Name of the yaml parameter file '
+    )
+
+    
+
     nav2_params_file = PathJoinSubstitution([
         FindPackageShare('gorm_nav2'),
         'params',
-        'gorm_nav2.yaml'
+        LaunchConfiguration('config')
+        
     ])
     
+    # Include the main Nav2 launch file with the parameter file
+    # and add the remap for /cmd_vel -> /remote/cmd_vel
     nav2_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(nav2_bringup_path),
-        launch_arguments=[
-            ('params_file', nav2_params_file)
-        ]
+        launch_arguments={
+            'params_file': nav2_params_file,
+            'cmd_vel_nav': '/remote/cmd_vel'  # Remap target topic
+        }.items()
     )
 
     return LaunchDescription([
+        yaml_name_arg,
         nav2_launch
     ])

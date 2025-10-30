@@ -26,7 +26,13 @@ def generate_launch_description():
     left_info = f'{stereo_namespace}/left/camera_info'
     right_info = f'{stereo_namespace}/right/camera_info'
 
-    
+    map_republisher = Node(
+    package='gorm_vslam',
+    executable='map_republisher.py',
+    name='map_republisher',
+    output='screen'
+    )
+
 
     # Include RTAB-Map launch file with conditional topics
     rtabmap_launch = IncludeLaunchDescription(
@@ -45,13 +51,14 @@ def generate_launch_description():
             'rgb_topic': rgb_topic,
             'depth_topic': '/zed_front/zed/depth/depth_registered',
             'camera_info_topic': camera_info_topic,
+            'publish_tf':'true',
             'publish_tf_map':'True',
             'publish_tf_odom':'True',
             'frame_id': 'base_link',
             'odom_frame_id': 'odom',
             'map_frame_id': 'map',
             #'localization': 'false',
-            'database_path': map_db_path,
+            #'database_path': map_db_path,
             'approx_sync': 'true',
             'use_sim_time': 'false',
             'qos': '1',
@@ -122,7 +129,8 @@ def generate_launch_description():
             "'Selected Camera Info topic: ' + '", camera_info_topic, "'"
         ])),
 
-        static_transform,
+        #static_transform,
         rtabmap_launch,
+        map_republisher,
         delayed_actions
     ])
