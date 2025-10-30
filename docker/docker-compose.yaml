@@ -32,8 +32,8 @@ services:
     stdin_open: true
     tty: true
     environment:
-      - ROS_DOMAIN_ID=0
-      - FASTRTPS_DEFAULT_PROFILES_FILE=/home/workspace/fastrtps-profiles.xml
+      - ROS_DOMAIN_ID=50
+      - RMW_IMPLEMENTATION=rmw_zenoh_cpp
     network_mode: host
     privileged: true
     runtime: nvidia
@@ -72,8 +72,8 @@ services:
       - ./configs/fastrtps-profiles.xml:/home/workspace/fastrtps-profiles.xml
     working_dir: /home/workspace
     environment:
-      - ROS_DOMAIN_ID=0
-      - FASTRTPS_DEFAULT_PROFILES_FILE=/home/workspace/fastrtps-profiles.xml
+      - ROS_DOMAIN_ID=50
+      - RMW_IMPLEMENTATION=rmw_zenoh_cpp
     network_mode: host
     privileged: true
     runtime: nvidia
@@ -107,6 +107,8 @@ services:
         ZED_ROS2_WRAPPER_BRANCH: master
         ZED_ROS2_WRAPPER_URL: https://github.com/stereolabs/zed-ros2-wrapper.git
     container_name: rover-cameras
+    depends_on:
+      - zenoh-router
     volumes:
       - ../src:/home/workspace/src
       - /tmp/argus_socket:/tmp/argus_socket
@@ -120,10 +122,8 @@ services:
     stdin_open: true
     tty: true
     environment:
-      - ROS_DOMAIN_ID=0
-      #- RMW_IMPLEMENTATION=rmw_zenoh_cpp
-      - FASTRTPS_DEFAULT_PROFILES_FILE=/home/workspace/fastrtps-profiles.xml
-      # - RMW_IMPLEMENTATION=rmw_fastrtps_cpp - default dds implementation, however fucks the networking when using cameras
+      - ROS_DOMAIN_ID=50
+      - RMW_IMPLEMENTATION=rmw_zenoh_cpp
     network_mode: host
     privileged: true
     runtime: nvidia
@@ -167,10 +167,8 @@ services:
     stdin_open: true
     tty: true
     environment:
-      - ROS_DOMAIN_ID=0
-      #- RMW_IMPLEMENTATION=rmw_zenoh_cpp
-      - FASTRTPS_DEFAULT_PROFILES_FILE=/home/workspace/fastrtps-profiles.xml
-      # - RMW_IMPLEMENTATION=rmw_fastrtps_cpp - default dds implementation, however fucks the networking when using cameras
+      - ROS_DOMAIN_ID=50
+      - RMW_IMPLEMENTATION=rmw_zenoh_cpp
     network_mode: host
     privileged: true
     runtime: nvidia
@@ -209,21 +207,6 @@ services:
       - RUST_LOG=debug
 
 
-  triton-server:
-    image: nvcr.io/nvidia/tritonserver:23.02-py3
-    container_name: triton-server
-    volumes:
-      - ./triton_models:/models
-    network_mode: host
-    # ports:
-    #   - "8000:8000" # HTTP
-    #   - "8001:8001" # gRPC
-    #   - "8002:8002" # Metrics
-    command: tritonserver --model-repository=/models
-    runtime: nvidia
-    privileged: true
-
-
 
 ## --------------------------------------------------------  FOR LATER DEV MAYBE ----------------------------------------------_## hehe
 
@@ -249,3 +232,16 @@ services:
   #   depends_on:
   #     - cameras-deploy
   
+  # triton-server:
+  #   image: nvcr.io/nvidia/tritonserver:23.02-py3
+  #   container_name: triton-server
+  #   volumes:
+  #     - ./triton_models:/models
+  #   network_mode: host
+  #   # ports:
+  #   #   - "8000:8000" # HTTP
+  #   #   - "8001:8001" # gRPC
+  #   #   - "8002:8002" # Metrics
+  #   command: tritonserver --model-repository=/models
+  #   runtime: nvidia
+  #   privileged: true
