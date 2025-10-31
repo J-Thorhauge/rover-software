@@ -10,10 +10,10 @@ def generate_launch_description():
     ld = LaunchDescription()
 
     # cmd_vel to motor commands converter
-    ackermann_node = Node(
+    ackermann_nav2 = Node(
         package='gorm_base_control',
-        executable='ackermann_node',
-        name='ackermann_node',
+        executable='ackermann_nav2',
+        name='ackermann_nav2',
         output='screen'
     )
 
@@ -51,7 +51,7 @@ def generate_launch_description():
 
     ld.add_action(joy_node)
     ld.add_action(joy_to_cmd_vel_node)
-    ld.add_action(ackermann_node)
+    ld.add_action(ackermann_nav2)
     ld.add_action(motor_driver_node)
     ld.add_action(web_interface)
 
