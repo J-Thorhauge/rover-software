@@ -79,7 +79,7 @@ controller_server:
       batch_size: 2000
       vx_std: 1.5
       vy_std: 1.5
-      wz_std: 0.4
+      wz_std: 1.5
       vx_max: 2.0
       vx_min: -1.0
       vy_max: 0.5

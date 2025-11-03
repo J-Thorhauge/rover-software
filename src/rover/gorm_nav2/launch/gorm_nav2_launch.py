@@ -2,6 +2,7 @@ import os
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch_ros.substitutions import FindPackageShare
+from launch_ros.actions import Node
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import PathJoinSubstitution, LaunchConfiguration, TextSubstitution
 
@@ -27,6 +28,21 @@ def generate_launch_description():
         LaunchConfiguration('config')
         
     ])
+
+    # Launch the Ackermann BT control servers
+    steering_server = Node(
+        package='ackermann_bt_control',
+        executable='steering_action_server',
+        name='steering_action_server',
+        output='screen'
+    )
+
+    rotate_server = Node(
+        package='ackermann_bt_control',
+        executable='rotation_action_server',
+        name='rotation_action_server',
+        output='screen'
+    )
     
     # Include the main Nav2 launch file with the parameter file
     # and add the remap for /cmd_vel -> /remote/cmd_vel
