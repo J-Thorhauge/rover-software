@@ -3,11 +3,24 @@ from launch import LaunchDescription
 from launch_ros.actions import Node
 from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.substitutions import FileContent, PathJoinSubstitution
+from launch_ros.substitutions import FindPackageShare
 from ament_index_python.packages import get_package_share_directory
 import os
 
 def generate_launch_description():
     ld = LaunchDescription()
+
+    urdf = FileContent(
+        PathJoinSubstitution([FindPackageShare('gorm'), 'urdf', 'grom_simple.urdf.xml']))
+    
+    state_publisher = Node(
+        package='robot_state_publisher',
+        executable='robot_state_publisher',
+        name='robot_state_publisher',
+        output='screen',
+        parameters=[{'use_sim_time': False, 'robot_description': urdf}],
+        arguments=[urdf]),
 
     # cmd_vel to motor commands converter
     ackermann_nav2 = Node(
@@ -45,6 +58,7 @@ def generate_launch_description():
         ])
     )
 
+    ld.add_action(state_publisher)
     ld.add_action(control_switch)
     ld.add_action(teleop_launch) 
     ld.add_action(ackermann_nav2)
