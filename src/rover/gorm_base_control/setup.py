@@ -25,6 +25,7 @@ setup(
     entry_points={
         'console_scripts': [
             'ackermann_node = gorm_base_control.ackermann_node:main',
+            'ackermann_nav2 = gorm_base_control.ackermann_nav2:main',
             'motor_driver_node = gorm_base_control.motor_driver_node:main',
         ],
     },

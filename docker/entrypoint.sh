@@ -42,7 +42,8 @@ then
     cd /home/workspace
     colcon build
     source install/setup.bash
-    ros2 launch gorm_bringup bringup_teleop.launch.py
+    # ros2 launch gorm_bringup bringup_teleop.launch.py
+    ros2 run gorm_bringup rover_lifecycle
 
 	bash
 

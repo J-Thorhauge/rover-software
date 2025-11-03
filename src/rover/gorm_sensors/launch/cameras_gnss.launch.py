@@ -55,11 +55,30 @@ def generate_launch_description():
             'namespace': 'zed_front',  # Namespace for the camera node
         }.items()
     )
-    static_tf_node = Node(
+    static_tf_node_f = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
-        name='static_transform_publisher_zed_base',
-        arguments=['0.0', '0.0', '0.0', '0.0', '0.2618', '0.0', 'base_link', 'zed_camera_link'],
+        name='static_transform_publisher_zed_base_f',
+        arguments=['0.280', '-0.264', '0.472', '0.1222', '0.2618', '0.0', 'chassis_link', 'zed_camera_link'],
+        # arguments=['0.0', '0.0', '0.0', '0.0', '0.2618', '0.0', 'base_link', 'zed_camera_link'],
+        # Arguments: x y z yaw pitch roll parent_frame child_frame
+        # Note: yaw, pitch, roll are in radians!
+    )
+
+    static_tf_node_b = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='static_transform_publisher_zed_base_b',
+        arguments=['-0.282', '0.264', '0.340', '3.4033', '0.2618', '0.0', 'chassis_link', 'zed_camera_link_b'],
+        # Arguments: x y z yaw pitch roll parent_frame child_frame
+        # Note: yaw, pitch, roll are in radians!
+    )
+
+    static_tf_node_b = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='static_transform_publisher_zed_base_c',
+        arguments=['-0.0', '0.0', '0.302', '0.0', '0.0', '0.0', 'base_link', 'chassis_link'],
         # Arguments: x y z yaw pitch roll parent_frame child_frame
         # Note: yaw, pitch, roll are in radians!
     )
@@ -84,7 +103,9 @@ def generate_launch_description():
         parameters=[params_file],
     )
 
-    ld.add_action(static_tf_node)
+    ld.add_action(static_tf_node_f)
+    ld.add_action(static_tf_node_b)
+    ld.add_action(static_tf_node_c)
     ld.add_action(zed_tracking)
     ld.add_action(zed_front)
     ld.add_action(ublox_gps_node)

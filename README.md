@@ -52,6 +52,7 @@ Notes:
 - Build production image: `./build.sh`
 - Attach to container: `docker exec -it rover bash` (dev) or `docker compose -f docker/docker-compose.yaml exec rover-deploy bash` (prod)
 - Tail logs: `docker compose -f docker/docker-compose.yaml logs -f <service>`
+- Reset Motors after E-stop: `ros2 topic pub -1 /restart_rover std_msgs/Empty "{}"`
 
 ## SSH access to the rover
 
