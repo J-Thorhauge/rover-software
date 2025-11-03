@@ -3,20 +3,14 @@
     <link name="base_link">
     </link>
 
-    <joint name="base_chassis" type="static">
-        <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.302" />
-        <parent link="base_link" />
-        <child link="link_1" />
-    </joint>
-
     <link name="chassis_link">
         <visual>
-            <origin rpy="0 0 0" xyz="0 0 0" />
+            <origin rpy="0.0 0.0 1.571" xyz="-0.09256 0.0 0.2110" />
             <geometry>
                 <mesh filename="package://gorm_bringup/meshes/gorm_primitive.stl" />
             </geometry>
             <material name="">
-                <color rgba="1 1 0 1" />
+                <color rgba="0.1 0.1 0.8 1" />
             </material>
         </visual>
         <collision>
@@ -37,7 +31,7 @@
     </link>
 
     <joint name="chassis_cam_front" type="fixed">
-        <origin rpy="0.1222, 0.2618, 0.0" xyz="0.280, -0.264, 0.472" />
+        <origin rpy="0.0 0.2618 0.1222" xyz="0.280 -0.264 0.472" />
         <parent link="chassis_link" />
         <child link="zed_camera_link" />
     </joint>
@@ -46,7 +40,7 @@
     </link>
 
     <joint name="chassis_cam_back" type="fixed">
-        <origin rpy="3.2637, 0.2618, 0.0" xyz="-0.282, 0.264, 0.340" />
+        <origin rpy="0.0 0.2618 3.2637" xyz="-0.282 0.264 0.340" />
         <parent link="chassis_link" />
         <child link="zed_camera_link_b" />
     </joint>
