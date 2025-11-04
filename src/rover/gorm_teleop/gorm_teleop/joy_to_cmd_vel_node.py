@@ -34,6 +34,7 @@ class JoyToVelNode(Node):
         self.linear_vel = 0.0
         self.angular_vel = 0.0
         self.speed_multi = 1
+        self.active_state = True
 
         self.get_logger().info(f"Joy to vel converter node started. Subscribing to '{joy_topic}' and publishing to '{twist_topic}'.")
 
@@ -47,27 +48,29 @@ class JoyToVelNode(Node):
 
 
         self.speed_multi = self.check_ABXY_pressed(msg)
+        self.active_state = self.check_start_back(msg)
    
 
         # Strech the circle to a square
         linear_vel, angular_vel = self.circle_to_square(linear_vel, angular_vel)
 
-        # Turn on point
-        if abs(right_stick_x)>0.0001:
-            # Create and publish the message
-            twist = Twist()
-            twist.angular.z = right_stick_x*self.speed_multi*4
-            twist.angular.x = right_stick_x*self.speed_multi*4
-            
+        if self.active_state:
+            # Turn on point
+            if abs(right_stick_x)>0.0001:
+                # Create and publish the message
+                twist = Twist()
+                twist.angular.z = right_stick_x*self.speed_multi*4
+                twist.angular.x = right_stick_x*self.speed_multi*4
+                
 
-            self.publisher_.publish(twist)
-        else:
-            # Create and publish the message
-            twist = Twist()
-            twist.linear.x = linear_vel*self.speed_multi
-            twist.angular.z = angular_vel*self.speed_multi
+                self.publisher_.publish(twist)
+            else:
+                # Create and publish the message
+                twist = Twist()
+                twist.linear.x = linear_vel*self.speed_multi
+                twist.angular.z = angular_vel*self.speed_multi
 
-            self.publisher_.publish(twist)
+                self.publisher_.publish(twist)
 
 
 
@@ -90,6 +93,13 @@ class JoyToVelNode(Node):
         if msg.buttons[3]==1:
             return 0.5
         return self.speed_multi
+    
+    def check_start_back(self, msg):
+        if msg.buttons[6]==1:
+            return False
+        elif msg.buttons[7]==1:
+            return True
+        return self.active_state
 
     def circle_to_square(self, x, y):
         # Ensure the point (x, y) lies within the unit circle
