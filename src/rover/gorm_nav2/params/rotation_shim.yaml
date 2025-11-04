@@ -89,9 +89,18 @@ controller_server:
       yaw_goal_tolerance: 0.25
       stateful: True
     FollowPath:
-      plugin: "nav2_regulated_pure_pursuit_controller::RegulatedPurePursuitController"
-      desired_linear_vel: 2.0
-      lookahead_dist: 0.6
+      plugin: "nav2_rotation_shim_controller::RotationShimController"
+      primary_controller: "nav2_regulated_pure_pursuit_controller::RegulatedPurePursuitController"
+      angular_dist_threshold: 0.785
+      forward_sampling_distance: 0.5
+      angular_disengage_threshold: 0.3925
+      rotate_to_heading_angular_vel: 1.8
+      max_angular_accel: 3.2
+      simulate_ahead_time: 1.0
+      rotate_to_goal_heading: false
+      # Primary controller params
+      desired_linear_vel: 1.5
+      lookahead_dist: 0.4
       min_lookahead_dist: 0.3
       max_lookahead_dist: 0.9
       lookahead_time: 1.5
@@ -112,7 +121,7 @@ controller_server:
       regulated_linear_scaling_min_speed: 0.25
       use_rotate_to_heading: true
       allow_reversing: false
-      rotate_to_heading_min_angle: 0.2 #0.785
+      rotate_to_heading_min_angle: 0.785
       max_angular_accel: 3.2
       max_robot_pose_search_dist: 10.0
       min_distance_to_obstacle: 0.0
@@ -130,12 +139,12 @@ local_costmap:
       width: 3
       height: 3
       resolution: 0.05
-      footprint: "[[0.55,0.4532],[0.55,-0.4532],[-0.55,-0.4532],[-0.55,0.4532]]"
+      robot_radius: 0.6
       plugins: ["voxel_layer", "inflation_layer"]
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
         cost_scaling_factor: 3.0
-        inflation_radius: 0.5  #This might seem high, but the maintainers of nav2 recommend a higher than expected inflation radius to create a smoother potential field 
+        inflation_radius: 0.2
       voxel_layer:
         plugin: "nav2_costmap_2d::VoxelLayer"
         enabled: True
@@ -179,7 +188,7 @@ global_costmap:
       global_frame: map
       robot_base_frame: base_link
       use_sim_time: False
-      footprint: "[[0.4532,0.55],[0.4532,-0.55],[-0.4532,-0.55],[-0.4532,0.55]]"
+      robot_radius: 0.6
       resolution: 0.05
       track_unknown_space: true
       plugins: ["static_layer", "inflation_layer"]
@@ -189,7 +198,7 @@ global_costmap:
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
         cost_scaling_factor: 3.0
-        inflation_radius: 0.5
+        inflation_radius: 0.2
       always_send_full_costmap: True
 
 map_server:
@@ -293,23 +302,14 @@ waypoint_follower:
 #         do_refinement: true
 #         refinement_num: 2
 
-planner_server:
-  ros__parameters:
-    planner_plugins: ['GridBased']
-    GridBased:
-      plugin: 'nav2_navfn_planner/NavfnPlanner' # In Iron and older versions, "/" was used instead of "::"
-      use_astar: True
-      allow_unknown: True
-      tolerance: 1.0
-
 velocity_smoother:
   ros__parameters:
     use_sim_time: False
     smoothing_frequency: 20.0
     scale_velocities: False
     feedback: "OPEN_LOOP"
-    max_velocity: [2.0, 0.0, 5.0]
-    min_velocity: [-2.0, 0.0, -5.0]
+    max_velocity: [1.5, 0.0, 1.5]
+    min_velocity: [-1.5, 0.0, -1.5]
     max_accel: [2.5, 0.0, 3.2]
     max_decel: [-2.5, 0.0, -3.2]
     odom_topic: "rtabmap/odom"

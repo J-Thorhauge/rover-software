@@ -1,10 +1,16 @@
-<BehaviorTree ID="AckermannNavigateWithTurnControl">
-  <Sequence name="RootSequence">
+<root main_tree_to_execute="AckermannTurnTree">
+  <BehaviorTree ID="AckermannTurnTree">
 
+    <!--
+      If the robot needs to turn sharply, handle it with steering + spin sequence.
+      Otherwise, navigate normally.
+    -->
     <Fallback name="HandleTurnIfNeeded">
 
+      <!-- Turn-on-spot sequence -->
       <Sequence name="TurnOnSpotSequence">
-        <!-- Check if large heading change -->
+
+        <!-- Check if a large heading change is required -->
         <ScriptCondition
           name="NeedsLargeTurn"
           code="
@@ -18,14 +24,25 @@
             return math.abs(curr_yaw - goal_yaw) > 0.6
           "/>
 
-        <SetSteering target='turn_on_spot'/>
+        <!-- Step 1: Turn wheels to spin configuration -->
+        <SetSteering target="turn_on_spot"/>
+
+        <!-- Step 2: Wait for steering actuators -->
         <Wait delay="0.5"/>
-        <RotateInPlace angular_speed="0.4"/>
-        <SetSteering target='straight'/>
+
+        <!-- Step 3: Rotate robot on the spot -->
+        <RotateInPlace angular_speed="0.8"/>
+
+        <!-- Step 4: Restore steering to straight driving -->
+        <SetSteering target="straight"/>
+
       </Sequence>
 
-      <DriveSmooth/>
+      <!-- If no large turn is needed, proceed with normal navigation -->
+      <NavigateToPose/>
+
     </Fallback>
 
-  </Sequence>
-</BehaviorTree>
+  </BehaviorTree>
+</root>
+
