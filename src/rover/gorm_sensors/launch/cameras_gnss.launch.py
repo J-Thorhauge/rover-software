@@ -69,16 +69,16 @@ def generate_launch_description():
         package='tf2_ros',
         executable='static_transform_publisher',
         name='static_transform_publisher_zed_base_b',
-        arguments=['-0.282', '0.264', '0.340', '3.4033', '0.2618', '0.0', 'chassis_link', 'zed_camera_link_b'],
+        arguments=['-0.282', '0.264', '0.340', '3.2637', '0.2618', '0.0', 'chassis_link', 'zed_camera_link_b'],
         # Arguments: x y z yaw pitch roll parent_frame child_frame
         # Note: yaw, pitch, roll are in radians!
     )
 
-    static_tf_node_b = Node(
+    static_tf_node_c = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
         name='static_transform_publisher_zed_base_c',
-        arguments=['-0.0', '0.0', '0.302', '0.0', '0.0', '0.0', 'base_link', 'chassis_link'],
+        arguments=['0.0', '0.0', '0.302', '0.0', '0.0', '0.0', 'base_link', 'chassis_link'],
         # Arguments: x y z yaw pitch roll parent_frame child_frame
         # Note: yaw, pitch, roll are in radians!
     )
