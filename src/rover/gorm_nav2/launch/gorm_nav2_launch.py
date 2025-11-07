@@ -50,7 +50,7 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(nav2_bringup_path),
         launch_arguments={
             'params_file': nav2_params_file,
-            'cmd_vel_nav': '/remote/cmd_vel'  # Remap target topic
+            'cmd_vel_nav': '/remote/cmd_vel',  # Remap target topic       
         }.items()
     )
 

@@ -80,7 +80,7 @@ controller_server:
       vx_std: 0.3
       vy_std: 0.0
       wz_std: 0.3
-      vx_max: 2.2
+      vx_max: 2.0
       vx_min: 1.0
       vy_max: 0.0
       wz_max: 2.0
@@ -192,7 +192,7 @@ local_costmap:
       width: 3
       height: 3
       resolution: 0.05
-      robot_radius: 0.6
+      footprint: "[[0.55,0.4532],[0.55,-0.4532],[-0.55,-0.4532],[-0.55,0.4532]]"
       plugins: ["voxel_layer", "inflation_layer"]
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
@@ -241,7 +241,7 @@ global_costmap:
       global_frame: map
       robot_base_frame: base_link
       use_sim_time: False
-      robot_radius: 0.6
+      footprint: "[[0.55,0.4532],[0.55,-0.4532],[-0.55,-0.4532],[-0.55,0.4532]]"
       resolution: 0.05
       track_unknown_space: true
       plugins: ["static_layer", "inflation_layer"]
@@ -325,7 +325,7 @@ planner_server:
       max_iterations: 1000000             # maximum total iterations to search for before failing (in case unreachable), set to -1 to disable
       max_on_approach_iterations: 1000    # Maximum number of iterations after within tolerances to continue to try to find exact solution
       max_planning_time: 5.0              # max time in s for planner to plan, smooth
-      motion_model_for_search: "DUBIN"    # Hybrid-A* Dubin, Redds-Shepp
+      motion_model_for_search: "REEDS_SHEPP"    # Hybrid-A* Dubin, Redds-Shepp
       angle_quantization_bins: 72         # Number of angle bins for search
       analytic_expansion_ratio: 3.5       # The ratio to attempt analytic expansions during search for final approach.
       analytic_expansion_max_length: 3.0  # For Hybrid/Lattice nodes: The maximum length of the analytic expansion to be considered valid to prevent unsafe shortcutting
@@ -361,8 +361,8 @@ velocity_smoother:
     smoothing_frequency: 20.0
     scale_velocities: False
     feedback: "OPEN_LOOP"
-    max_velocity: [1.5, 0.0, 1.5]
-    min_velocity: [-1.0, 0.0, -1.0]
+    max_velocity: [2.0, 0.0, 2.0]
+    min_velocity: [1.0, 0.0, -1.0]
     max_accel: [2.5, 0.0, 3.2]
     max_decel: [-2.5, 0.0, -3.2]
     odom_topic: "rtabmap/odom"
