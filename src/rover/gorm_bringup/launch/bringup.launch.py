@@ -8,8 +8,8 @@ def generate_launch_description():
     # cmd_vel to motor commands converter
     ackermann_node = Node(
         package='gorm_base_control',
-        executable='ackermann_node',
-        name='ackermann_node',
+        executable='ackermann_nav2',
+        name='ackermann_nav2',
         output='screen'
     )
 

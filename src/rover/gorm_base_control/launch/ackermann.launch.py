@@ -5,7 +5,7 @@ def generate_launch_description():
     return LaunchDescription([
         Node(
             package='gorm_base_control',
-            executable='ackermann_node',
-            name='ackermann_node'
+            executable='ackermann_nav2',
+            name='ackermann_nav2'
         ),
     ])

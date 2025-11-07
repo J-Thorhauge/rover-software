@@ -12,8 +12,27 @@ def generate_launch_description():
     rgb_topic = LaunchConfiguration('rgb_topic')
     camera_info_topic = LaunchConfiguration('camera_info_topic')
 
+
+
+
     # RTAB-Map launch directory
     rtabmap_launch_dir = FindPackageShare('rtabmap_launch').find('rtabmap_launch')
+
+    map_db_path ='/home/roy/Documents/vslam_maps/inside_recording.db'
+
+    stereo_namespace = '/zed_front/zed'
+    left_image = f'{stereo_namespace}/left/image_rect_color'
+    right_image = f'{stereo_namespace}/right/image_rect_color'
+    left_info = f'{stereo_namespace}/left/camera_info'
+    right_info = f'{stereo_namespace}/right/camera_info'
+
+    map_republisher = Node(
+    package='gorm_vslam',
+    executable='map_republisher.py',
+    name='map_republisher',
+    output='screen'
+    )
+
 
     # Include RTAB-Map launch file with conditional topics
     rtabmap_launch = IncludeLaunchDescription(
@@ -23,15 +42,29 @@ def generate_launch_description():
         launch_arguments={
             'compressed': 'true',
             'rtabmap_args': "--delete_db_on_start ",
+
+            #'stereo': 'true', #save this for comparison in report
+            'visual_odometry': 'true',
+            'icp_odometry': 'false',
+            
+
             'rgb_topic': rgb_topic,
             'depth_topic': '/zed_front/zed/depth/depth_registered',
             'camera_info_topic': camera_info_topic,
+            'publish_tf':'true',
+            'publish_tf_map':'True',
+            'publish_tf_odom':'True',
             'frame_id': 'base_link',
+            'odom_frame_id': 'odom',
+            'map_frame_id': 'map',
+            #'localization': 'false',
+            #'database_path': map_db_path,
             'approx_sync': 'true',
-            'use_sim_time': 'true',
+            'use_sim_time': 'false',
             'qos': '1',
             'topic_queue_size': '100',
             'sync_queue_size': '300',
+
             'rviz': LaunchConfiguration('rviz'),
             'rtabmap_viz': LaunchConfiguration('rtabmap_viz')
         }.items()
@@ -96,7 +129,8 @@ def generate_launch_description():
             "'Selected Camera Info topic: ' + '", camera_info_topic, "'"
         ])),
 
-        static_transform,
+        #static_transform,
         rtabmap_launch,
+        map_republisher,
         delayed_actions
     ])

@@ -35,12 +35,12 @@ class AckermannNode(Node):
         self.last_message_time = self.get_clock().now()
         linear_vel = msg.linear.x
         angular_vel = msg.angular.z
-        min_ang_vel_to_turn = 0.1 #minimum angular velocity to turn
+        min_ang_vel_to_turn = 0.3 #minimum angular velocity received from cmd_vel to turn
         max_lin_vel_to_turn = 0.3 #max linear velocity allowed before turning 
         #TODO
         #both these are so far just magic numbers, add dynamic value based on desired linear velocity
     
-        if abs(msg.angular.z) > min_ang_vel_to_turn and abs(msg.linear.x) < max_lin_vel_to_turn:
+        if abs(angular_vel) > min_ang_vel_to_turn and abs(linear_vel) < max_lin_vel_to_turn:
             steering_angles, wheel_velocities = self.turn_on_spot(angular_vel)
         else:
             # Your Ackermann function here, assume it returns steering_angles and wheel_velocities
@@ -71,12 +71,12 @@ class AckermannNode(Node):
         steering_angles = np.array([theta_FL, theta_FR, theta_RL, theta_RR]) * -1
 
         # Wheel velocities for pure spin
-        V_FL = -(ang_vel)
-        V_FR = -(ang_vel)
-        V_ML = -(ang_vel)
-        V_MR = -(ang_vel)
-        V_RL = -(ang_vel)
-        V_RR = -(ang_vel)
+        V_FL = -(ang_vel*4)
+        V_FR = -(ang_vel*4)
+        V_ML = -(ang_vel*4)
+        V_MR = -(ang_vel*4)
+        V_RL = -(ang_vel*4)
+        V_RR = -(ang_vel*4)
 
         wheel_velocities = np.array([V_FL, V_FR, V_ML, V_MR, V_RL, V_RR]) / (wheel_radius * 2)
         return steering_angles, wheel_velocities
