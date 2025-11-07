@@ -59,8 +59,8 @@ class JoyToVelNode(Node):
             if abs(right_stick_x)>0.0001:
                 # Create and publish the message
                 twist = Twist()
-                twist.angular.z = right_stick_x*self.speed_multi*4
-                twist.angular.x = right_stick_x*self.speed_multi*4
+                twist.angular.z = right_stick_x*self.speed_multi
+                twist.angular.x = right_stick_x*self.speed_multi
                 
 
                 self.publisher_.publish(twist)

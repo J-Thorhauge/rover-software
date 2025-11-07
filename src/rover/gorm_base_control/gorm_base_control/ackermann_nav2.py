@@ -71,12 +71,12 @@ class AckermannNode(Node):
         steering_angles = np.array([theta_FL, theta_FR, theta_RL, theta_RR]) * -1
 
         # Wheel velocities for pure spin
-        V_FL = -(ang_vel*4)
-        V_FR = -(ang_vel*4)
-        V_ML = -(ang_vel*4)
-        V_MR = -(ang_vel*4)
-        V_RL = -(ang_vel*4)
-        V_RR = -(ang_vel*4)
+        V_FL = -(ang_vel*10)
+        V_FR = -(ang_vel*10)
+        V_ML = -(ang_vel*10)
+        V_MR = -(ang_vel*10)
+        V_RL = -(ang_vel*10)
+        V_RR = -(ang_vel*10)
 
         wheel_velocities = np.array([V_FL, V_FR, V_ML, V_MR, V_RL, V_RR]) / (wheel_radius * 2)
         return steering_angles, wheel_velocities
