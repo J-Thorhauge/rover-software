@@ -1,0 +1,21 @@
+<library path="elevation_layer">
+  <class name="elevation_costmap_plugin/ElevationLayer"
+         type="elevation_costmap_plugin::ElevationLayer"
+         base_class_type="nav2_costmap_2d::Layer">
+    <description>Elevation-based costmap layer</description>
+  </class>
+</library>
+
+<!-- <library path="lib/libelevation_costmap_plugin">
+  <class name="elevation_costmap_plugin/ElevationLayer"
+         type="elevation_costmap_plugin::ElevationLayer"
+         base_class_type="nav2_costmap_2d::Layer">
+    <description>Elevation-based costmap layer</description>
+  </class>
+</library> -->
+
+<!-- <library path="nav2_elevation_costmap_plugin_core">
+  <class type="nav2_elevation_costmap_plugin::ElevationLayer" base_class_type="nav2_costmap_2d::Layer">
+    <description>This is an example plugin which puts repeating costs elevations to costmap</description>
+  </class>
+</library> -->
