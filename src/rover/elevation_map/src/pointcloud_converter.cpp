@@ -2,6 +2,7 @@
 #include <sensor_msgs/msg/point_cloud2.hpp>
 #include <grid_map_ros/grid_map_ros.hpp>
 #include <grid_map_ros/GridMapRosConverter.hpp>
+#include <grid_map_cv/GridMapCvConverter.hpp>
 #include <pcl_conversions/pcl_conversions.h>
 #include <pcl/point_types.h>
 #include <pcl/io/pcd_io.h>
@@ -41,6 +42,7 @@ private:
 
       grid_map::Position position(point.x, point.y);
 
+      
       if (!map_.isInside(position)) {
         grid_map::Position currentCenter = map_.getPosition();
         grid_map::Length currentLength = map_.getLength();
@@ -61,8 +63,31 @@ private:
         grid_map::Length newLength(maxX - minX, maxY - minY);
         grid_map::Position newCenter((maxX + minX) / 2.0, (maxY + minY) / 2.0);
 
-        map_.setGeometry(newLength, map_.getResolution(), newCenter);
+        // Create a new map and copy old data into it
+        // --- Corrected resizing logic ---
+        grid_map::GridMap newMap;
+        newMap.setFrameId(map_.getFrameId());
+        newMap.setGeometry(newLength, map_.getResolution(), newCenter);
+
+        // Add layers and copy data manually
+        for (const auto& layer : map_.getLayers()) {
+          newMap.add(layer);
+          for (grid_map::GridMapIterator it(newMap); !it.isPastEnd(); ++it) {
+            grid_map::Position pos;
+            newMap.getPosition(*it, pos);
+            if (map_.isInside(pos)) {
+              newMap.at(layer, *it) = map_.atPosition(layer, pos);
+            } else {
+              newMap.at(layer, *it) = NAN; // Fill with NaN if outside old map
+            }
+          }
+        }
+
+        // Replace old map
+        map_ = newMap;
+
       }
+
 
       if (!map_.isInside(position)) {
         RCLCPP_WARN(this->get_logger(), "Point at (%.2f, %.2f) is outside the map bounds after resizing.",

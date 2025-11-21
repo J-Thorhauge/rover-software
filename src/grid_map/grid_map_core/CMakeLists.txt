@@ -64,12 +64,6 @@ install(
   FILES_MATCHING PATTERN "*.hpp"
 )
 
-# Mark other files for installation
-install(
-  DIRECTORY doc
-  DESTINATION share/${PROJECT_NAME}
-)
-
 #############
 ## Testing ##
 #############
