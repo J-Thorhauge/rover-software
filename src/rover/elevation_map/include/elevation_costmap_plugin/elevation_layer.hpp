@@ -57,6 +57,11 @@
 #include <grid_map_core/grid_map_core.hpp>
 #include <grid_map_ros/grid_map_ros.hpp>
 #include <grid_map_msgs/msg/grid_map.hpp>
+#include <grid_map_cv/grid_map_cv.hpp>
+
+#include <opencv2/core.hpp>
+#include <opencv2/imgproc.hpp>
+
 
 
 
@@ -92,7 +97,12 @@ private:
 
   void gridMapCallback(const grid_map_msgs::msg::GridMap::SharedPtr msg);
 
+  void computeSlopeMap();
+
+  void inpaintElevationMap();
+
   grid_map::GridMap elevation_grid_;
+  grid_map::GridMap prev_elevation_grid_;
 
   rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr pointcloud_sub_;
   rclcpp::Subscription<grid_map_msgs::msg::GridMap>::SharedPtr gridmap_sub_;
@@ -104,6 +114,8 @@ private:
 
   double max_z = 1.0;
   double min_z = -1.0;
+
+  bool has_map_ = false;
 
   // Indicates that the entire elevation should be recalculated next time.
   bool need_recalculation_;

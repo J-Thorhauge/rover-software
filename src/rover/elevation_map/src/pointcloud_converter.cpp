@@ -6,6 +6,7 @@
 #include <pcl/point_types.h>
 #include <pcl/io/pcd_io.h>
 #include <pcl/common/common.h>
+#include <algorithm>
 
 class PCConvNode : public rclcpp::Node
 {
@@ -15,7 +16,7 @@ public:
     map_()
   {
     subscription_ = this->create_subscription<sensor_msgs::msg::PointCloud2>(
-      "/rtabmap/cloud_map", 10,
+      "/rtabmap/cloud_ground", 10,
       std::bind(&PCConvNode::pointCloudCallback, this, std::placeholders::_1));
 
     publisher_ = this->create_publisher<grid_map_msgs::msg::GridMap>("elevation_map", 10);
@@ -31,48 +32,59 @@ private:
     pcl::PointCloud<pcl::PointXYZ> pcl_cloud;
     pcl::fromROSMsg(*msg, pcl_cloud);
 
-    // map_.clear("elevation");
+    int n_points = 0;
 
     for (const auto& point : pcl_cloud.points) {
       if (!std::isfinite(point.z)) continue;
 
+      n_points++;
+
       grid_map::Position position(point.x, point.y);
 
-      // if (!map_.isInside(position)) {
+      if (!map_.isInside(position)) {
+        grid_map::Position currentCenter = map_.getPosition();
+        grid_map::Length currentLength = map_.getLength();
 
-      //   grid_map::Position currentCenter = map_.getPosition();
-      //   grid_map::Length currentLength = map_.getLength();
+        double halfX = currentLength.x() / 2.0;
+        double halfY = currentLength.y() / 2.0;
 
-      //   double halfX = currentLength.x() / 2.0;
-      //   double halfY = currentLength.y() / 2.0;
+        double minX = currentCenter.x() - halfX;
+        double maxX = currentCenter.x() + halfX;
+        double minY = currentCenter.y() - halfY;
+        double maxY = currentCenter.y() + halfY;
 
-      //   double minX = currentCenter.x() - halfX;
-      //   double maxX = currentCenter.x() + halfX;
-      //   double minY = currentCenter.y() - halfY;
-      //   double maxY = currentCenter.y() + halfY;
+        if (position.x() < minX) minX = position.x();
+        if (position.x() > maxX) maxX = position.x();
+        if (position.y() < minY) minY = position.y();
+        if (position.y() > maxY) maxY = position.y();
 
-      //   // Expand bounds if needed
-      //   if (position.x() < minX) minX = position.x();
-      //   if (position.x() > maxX) maxX = position.x();
-      //   if (position.y() < minY) minY = position.y();
-      //   if (position.y() > maxY) maxY = position.y();
+        grid_map::Length newLength(maxX - minX, maxY - minY);
+        grid_map::Position newCenter((maxX + minX) / 2.0, (maxY + minY) / 2.0);
 
-      //   // Compute new center and length
-      //   grid_map::Length newLength(maxX - minX, maxY - minY);
-      //   grid_map::Position newCenter((maxX + minX) / 2.0, (maxY + minY) / 2.0);
+        map_.setGeometry(newLength, map_.getResolution(), newCenter);
+      }
 
-      //   // Update geometry (preserves data)
-      //   map_.setGeometry(newLength, map_.getResolution(), newCenter);
+      if (!map_.isInside(position)) {
+        RCLCPP_WARN(this->get_logger(), "Point at (%.2f, %.2f) is outside the map bounds after resizing.",
+                    position.x(), position.y());
+        continue;
+      }
 
-      // }
-
-      // If the point is still outside after resizing, skip it
-      if (!map_.isInside(position)) continue;
-
-      map_.atPosition("elevation", position) = point.z;
+      if (std::isfinite(map_.atPosition("elevation", position))) {
+        // Average if already exists
+        float existing = map_.atPosition("elevation", position);
+        map_.atPosition("elevation", position) = (existing + point.z) / 2.0f;
+      } else {
+        map_.atPosition("elevation", position) = point.z;
+      }
     }
 
-    // Normalize elevation
+    RCLCPP_INFO(this->get_logger(), "Calculated elevation map with %d points.", n_points);
+
+    // Apply median filter to smooth holes
+    applyMedianFilter(map_, "elevation", 3);
+
+    // Normalize elevation values
     const auto& elevation = map_["elevation"];
     double min = elevation.minCoeff();
     double max = elevation.maxCoeff();
@@ -85,11 +97,8 @@ private:
       }
     }
 
+    // Convert to message and publish
     grid_map_msgs::msg::GridMap message;
-
-
-    // grid_map::GridMapRosConverter::toMessage(map_, message);
-    // auto message = std::make_unique<grid_map_msgs::msg::GridMap>();
 
     message.header.stamp = rclcpp::Time(map_.getTimestamp());
     message.header.frame_id = map_.getFrameId();
@@ -115,8 +124,38 @@ private:
     message.outer_start_index = map_.getStartIndex()(0);
     message.inner_start_index = map_.getStartIndex()(1);
 
-    
     publisher_->publish(message);
+  }
+
+  void applyMedianFilter(grid_map::GridMap& map, const std::string& layer, int windowSize)
+  {
+    grid_map::Matrix& data = map[layer];
+    grid_map::Matrix filtered = data;
+
+    int half = windowSize / 2;
+
+    for (grid_map::GridMapIterator it(map); !it.isPastEnd(); ++it) {
+      grid_map::Index index(*it);
+      std::vector<float> neighbors;
+
+      for (int dx = -half; dx <= half; ++dx) {
+        for (int dy = -half; dy <= half; ++dy) {
+          grid_map::Index nIndex(index(0) + dx, index(1) + dy);
+          if (!map.isValid(nIndex)) continue;
+          float val = data(nIndex(0), nIndex(1));
+          if (std::isfinite(val)) {
+            neighbors.push_back(val);
+          }
+        }
+      }
+
+      if (!neighbors.empty()) {
+        std::nth_element(neighbors.begin(), neighbors.begin() + neighbors.size() / 2, neighbors.end());
+        filtered(index(0), index(1)) = neighbors[neighbors.size() / 2];
+      }
+    }
+
+    data = filtered;
   }
 
   rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr subscription_;
@@ -127,10 +166,7 @@ private:
 int main(int argc, char *argv[])
 {
   rclcpp::init(argc, argv);
-
   auto node = std::make_shared<PCConvNode>();
-  // node->init();
-
   rclcpp::spin(node);
   rclcpp::shutdown();
   return 0;

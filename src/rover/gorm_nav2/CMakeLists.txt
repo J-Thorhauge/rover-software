@@ -7,9 +7,45 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
+# find_package(pluginlib REQUIRED)
+# find_package(nav2_costmap_2d REQUIRED)
+
 # uncomment the following section in order to fill in
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
+
+
+# ### Custom steepness based costmap ###
+# include_directories(include)
+
+
+# add_library(elevation_layer SHARED
+#   src/elevation_layer.cpp
+# )
+
+
+# ament_target_dependencies(elevation_layer
+#   rclcpp
+#   nav2_costmap_2d
+#   pluginlib
+# )
+
+# pluginlib_export_plugin_description_file(nav2_costmap_2d elevation_layer_plugin.xml)
+
+# install(TARGETS elevation_layer
+#   ARCHIVE DESTINATION lib
+#   LIBRARY DESTINATION lib
+#   RUNTIME DESTINATION bin
+# )
+
+# install(DIRECTORY include/
+#   DESTINATION include
+# )
+
+# install(FILES elevation_layer_plugin.xml
+#   DESTINATION share/${PROJECT_NAME}
+# )
+# ######################################
 
 # Install launch files
 install(DIRECTORY

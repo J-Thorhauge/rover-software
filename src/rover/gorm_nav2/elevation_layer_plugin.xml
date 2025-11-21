@@ -1,0 +1,7 @@
+<library path="lib/libelevation_layers">
+  <class name="elevation_layers::SteepnessLayer"
+         type="elevation_layers::SteepnessLayer"
+         base_class_type="nav2_costmap_2d::Layer">
+    <description>Steepness-based costmap layer</description>
+  </class>
+</library>
