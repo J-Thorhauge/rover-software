@@ -36,6 +36,8 @@ class JoyToVelNode(Node):
         self.speed_multi = 1
         self.active_state = True
 
+        self.pt_adjustment = 0.5 # Point turn adjustment factor
+
         self.get_logger().info(f"Joy to vel converter node started. Subscribing to '{joy_topic}' and publishing to '{twist_topic}'.")
 
     def listener_callback(self, msg):
@@ -59,8 +61,8 @@ class JoyToVelNode(Node):
             if abs(right_stick_x)>0.0001:
                 # Create and publish the message
                 twist = Twist()
-                twist.angular.z = right_stick_x*self.speed_multi
-                twist.angular.x = right_stick_x*self.speed_multi
+                twist.angular.z = right_stick_x*self.speed_multi*self.pt_adjustment
+                twist.angular.x = right_stick_x*self.speed_multi*self.pt_adjustment
                 
 
                 self.publisher_.publish(twist)

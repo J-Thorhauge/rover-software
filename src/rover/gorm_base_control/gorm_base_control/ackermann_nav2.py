@@ -38,8 +38,8 @@ class AckermannNode(Node):
         self.last_message_time = self.get_clock().now()
         linear_vel = msg.linear.x
         angular_vel = msg.angular.z
-        min_ang_vel_to_turn = 0.3 #minimum angular velocity received from cmd_vel to turn
-        max_lin_vel_to_turn = 0.3 #max linear velocity allowed before turning 
+        min_ang_vel_to_turn = 0.01 #minimum angular velocity received from cmd_vel to turn
+        max_lin_vel_to_turn = 0.01 #max linear velocity allowed before turning 
         #TODO
         #both these are so far just magic numbers, add dynamic value based on desired linear velocity
     
