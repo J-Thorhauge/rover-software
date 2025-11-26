@@ -27,6 +27,9 @@ class AckermannNode(Node):
         # Timer and timestamp
         self.last_message_time = self.get_clock().now()
         # self.timer = self.create_timer(0.1, self.check_timeout)
+
+        self.l1 = 0.38 # Distance from rotation center to middle wheels
+        self.l2 = 0.57 # Distance from rotation center to steerable wheels
         
         self.get_logger().info("Ackermann node started successfully")
 
@@ -35,8 +38,8 @@ class AckermannNode(Node):
         self.last_message_time = self.get_clock().now()
         linear_vel = msg.linear.x
         angular_vel = msg.angular.z
-        min_ang_vel_to_turn = 0.3 #minimum angular velocity received from cmd_vel to turn
-        max_lin_vel_to_turn = 0.3 #max linear velocity allowed before turning 
+        min_ang_vel_to_turn = 0.01 #minimum angular velocity received from cmd_vel to turn
+        max_lin_vel_to_turn = 0.01 #max linear velocity allowed before turning 
         #TODO
         #both these are so far just magic numbers, add dynamic value based on desired linear velocity
     
@@ -63,20 +66,20 @@ class AckermannNode(Node):
         Turn the vehicle on the spot (pure rotation).
         Returns steering angles and wheel velocities.
         """
-        # Steering angles (wheels at max deflection)
-        theta_FL = -np.pi/4
-        theta_FR = np.pi/4
-        theta_RL = np.pi/4
-        theta_RR = -np.pi/4
+        # Steering angles (wheels at max deflection) 0.83776 rad = 48 degrees
+        theta_FL = -0.83776 #-np.pi/4
+        theta_FR = 0.83776 #np.pi/4
+        theta_RL = 0.83776 #np.pi/4
+        theta_RR = -0.83776 #-np.pi/4
         steering_angles = np.array([theta_FL, theta_FR, theta_RL, theta_RR]) * -1
 
         # Wheel velocities for pure spin
-        V_FL = -(ang_vel*10)
-        V_FR = -(ang_vel*10)
-        V_ML = -(ang_vel*10)
-        V_MR = -(ang_vel*10)
-        V_RL = -(ang_vel*10)
-        V_RR = -(ang_vel*10)
+        V_FL = -(ang_vel*self.l2*10)
+        V_FR = -(ang_vel*self.l2*10)
+        V_ML = -(ang_vel*self.l1*10)
+        V_MR = -(ang_vel*self.l1*10)
+        V_RL = -(ang_vel*self.l2*10)
+        V_RR = -(ang_vel*self.l2*10)
 
         wheel_velocities = np.array([V_FL, V_FR, V_ML, V_MR, V_RL, V_RR]) / (wheel_radius * 2)
         return steering_angles, wheel_velocities
