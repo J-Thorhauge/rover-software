@@ -78,6 +78,13 @@ def generate_launch_description():
         ]
     )
 
+    pointcloud_converter = Node(
+        package='elevation_map',
+        executable='pointcloud_converter',
+        name='pointcloud_converter',
+        output='screen'
+    )
+
     static_transform = Node(
     package='tf2_ros',
     executable='static_transform_publisher',
@@ -131,6 +138,7 @@ def generate_launch_description():
 
         #static_transform,
         rtabmap_launch,
+        pointcloud_converter,
         map_republisher,
         delayed_actions
     ])
