@@ -16,7 +16,7 @@ def generate_launch_description():
 
     yaml_name_arg = DeclareLaunchArgument(
         'config',
-        default_value='mppi.yaml',
+        default_value='rpp.yaml',
         description='Name of the yaml parameter file '
     )
 

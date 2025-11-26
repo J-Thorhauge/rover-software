@@ -89,6 +89,9 @@ install(FILES check_heading_condition_plugin.xml
 install(FILES bt_xml/custom_bt_tree.xml
   DESTINATION share/${PROJECT_NAME}/bt_xml
 )
+install(FILES bt_xml/custom_navigate_through_poses.xml
+  DESTINATION share/${PROJECT_NAME}/bt_xml
+)
 
 ###############################
 
