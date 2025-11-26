@@ -93,7 +93,7 @@ controller_server:
       primary_controller: "nav2_regulated_pure_pursuit_controller::RegulatedPurePursuitController"
       angular_dist_threshold: 0.785
       forward_sampling_distance: 0.5
-      angular_disengage_threshold: 0.3925
+      angular_disengage_threshold: 0.15
       rotate_to_heading_angular_vel: 2.0
       max_angular_accel: 3.2
       simulate_ahead_time: 1.0
@@ -122,7 +122,7 @@ controller_server:
       use_rotate_to_heading: true
       allow_reversing: false
       rotate_to_heading_min_angle: 0.785
-      max_angular_accel: 3.2
+      max_angular_accel: 5.0
       max_robot_pose_search_dist: 10.0
       min_distance_to_obstacle: 0.0
       stateful: true
@@ -209,15 +209,15 @@ map_server:
     yaml_filename: ""
     
 
-# smoother_server:
-#   ros__parameters:
-#     use_sim_time: False
-#     smoother_plugins: ["simple_smoother"]
-#     simple_smoother:
-#       plugin: "nav2_smoother::SimpleSmoother"
-#       tolerance: 1.0e-10
-#       max_its: 1000
-#       do_refinement: True
+smoother_server:
+  ros__parameters:
+    use_sim_time: False
+    smoother_plugins: ["simple_smoother"]
+    simple_smoother:
+      plugin: "nav2_smoother::SimpleSmoother"
+      tolerance: 1.0e-10
+      max_its: 1000
+      do_refinement: True
 
 behavior_server:
   ros__parameters:
@@ -272,7 +272,7 @@ waypoint_follower:
 #       max_iterations: 1000000             # maximum total iterations to search for before failing (in case unreachable), set to -1 to disable
 #       max_on_approach_iterations: 1000    # Maximum number of iterations after within tolerances to continue to try to find exact solution
 #       max_planning_time: 5.0              # max time in s for planner to plan, smooth
-#       motion_model_for_search: "REEDS_SHEPP"    # Hybrid-A* Dubin, Redds-Shepp
+#       motion_model_for_search: "DUBIN"    # Hybrid-A* Dubin, REEDS_SHEPP
 #       angle_quantization_bins: 72         # Number of angle bins for search
 #       analytic_expansion_ratio: 3.5       # The ratio to attempt analytic expansions during search for final approach.
 #       analytic_expansion_max_length: 3.0  # For Hybrid/Lattice nodes: The maximum length of the analytic expansion to be considered valid to prevent unsafe shortcutting
@@ -304,12 +304,34 @@ waypoint_follower:
 
 # planner_server:
 #   ros__parameters:
-#     planner_plugins: ['GridBased']
+#     planner_plugins: ["GridBased"]
+
 #     GridBased:
-#       plugin: 'nav2_navfn_planner/NavfnPlanner' # In Iron and older versions, "/" was used instead of "::"
-#       use_astar: True
-#       allow_unknown: True
-#       tolerance: 1.0
+#       plugin: "nav2_smac_planner/SmacPlanner2D" # In Iron and older versions, "/" was used instead of "::"
+#       tolerance: 0.125                      # tolerance for planning if unable to reach exact pose, in meters
+#       downsample_costmap: false             # whether or not to downsample the map
+#       downsampling_factor: 1                # multiplier for the resolution of the costmap layer (e.g. 2 on a 5cm costmap would be 10cm)
+#       allow_unknown: true                   # allow traveling in unknown space
+#       max_iterations: 1000000               # maximum total iterations to search for before failing (in case unreachable), set to -1 to disable
+#       max_on_approach_iterations: 1000      # maximum number of iterations to attempt to reach goal once in tolerance
+#       max_planning_time: 2.0                # max time in s for planner to plan, smooth
+#       cost_travel_multiplier: 2.0           # Cost multiplier to apply to search to steer away from high cost areas. Larger values will place in the center of aisles more exactly (if non-`FREE` cost potential field exists) but take slightly longer to compute. To optimize for speed, a value of 1.0 is reasonable. A reasonable tradeoff value is 2.0. A value of 0.0 effective disables steering away from obstacles and acts like a naive binary search A*.
+#       use_final_approach_orientation: false # Whether to set the final path pose at the goal's orientation to the requested orientation (false) or in line with the approach angle so the robot doesn't rotate to heading (true)
+#       smoother:
+#         max_iterations: 1000
+#         w_smooth: 0.3
+#         w_data: 0.2
+#         tolerance: 1.0e-10
+
+planner_server:
+  ros__parameters:
+    planner_plugins: ['GridBased']
+    GridBased:
+      plugin: 'nav2_navfn_planner/NavfnPlanner' # In Iron and older versions, "/" was used instead of "::"
+      use_astar: True
+      allow_unknown: True
+      tolerance: 1.0
+
 
 velocity_smoother:
   ros__parameters:

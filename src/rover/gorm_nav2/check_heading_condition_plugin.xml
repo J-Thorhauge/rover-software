@@ -1,0 +1,10 @@
+
+<?xml version="1.0"?>
+<root>
+  <TreeNodesModel>
+    <Condition ID="CheckHeadingCondition">
+      <input_port name="goal">geometry_msgs/msg/PoseStamped — goal pose including orientation</input_port>
+      <input_port name="tolerance">angular tolerance in radians</input_port>
+    </Condition>
+  </TreeNodesModel>
+</root>
