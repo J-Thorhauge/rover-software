@@ -6,6 +6,7 @@ from launch.substitutions import LaunchConfiguration, PythonExpression
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.substitutions import FindPackageShare
 
+
 def generate_launch_description():
     # Launch configuration variables
     use_grayscale = LaunchConfiguration('use_grayscale')
@@ -13,6 +14,7 @@ def generate_launch_description():
     camera_info_topic = LaunchConfiguration('camera_info_topic')
 
 
+    
 
 
     # RTAB-Map launch directory
@@ -137,6 +139,7 @@ def generate_launch_description():
         ])),
 
         #static_transform,
+        #start_robot_localization,
         rtabmap_launch,
         pointcloud_converter,
         map_republisher,

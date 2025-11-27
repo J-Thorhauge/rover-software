@@ -3,7 +3,7 @@ bt_navigator:
   ros__parameters:
     #the default_nav_to_pose_goal requires an absolute path
     default_nav_to_pose_bt_xml: $(find-pkg-share gorm_nav2)/bt_xml/custom_bt_tree.xml
-    default_nav_through_poses_bt_xml: $(find-pkg-share gorm_nav2)/bt_xml/custom_navigate_through_poses.xml
+    #default_nav_through_poses_bt_xml: $(find-pkg-share gorm_nav2)/bt_xml/custom_navigate_through_poses.xml
     use_sim_time: False
     global_frame: map
     robot_base_frame: base_link
