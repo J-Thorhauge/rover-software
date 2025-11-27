@@ -100,8 +100,8 @@ void ElevationLayer::computeSlopeMap()
       slope = std::sqrt(dzdx * dzdx + dzdy * dzdy);
     }
 
-    if(slope > 5.0f) {
-      slope = 5.0f; // Cap slope to 5 for normalization
+    if(slope > 0.8f) {
+      slope = 0.8f; // Cap slope to 0.8 (about 38.6 degrees) for normalization
     }
     // if(slope < 0.01f) {
     //   slope = 0.01f;
@@ -218,10 +218,10 @@ void ElevationLayer::updateCosts(
     }
   }
 
-  auto node = node_.lock();
-  if (node) {
-    RCLCPP_WARN(node->get_logger(), "Elevation slope range: min = %.3f, max = %.3f", min_elev, max_elev);
-  }
+  // auto node = node_.lock();
+  // if (node) {
+  //   RCLCPP_WARN(node->get_logger(), "Elevation slope range: min = %.3f, max = %.3f", min_elev, max_elev);
+  // }
 
 
 
@@ -239,14 +239,14 @@ void ElevationLayer::updateCosts(
       }
     }
 
-    if (std::isnan(val)) {
+    // if (std::isnan(val)) {
 
-      auto node = node_.lock();
-      if (node) {
-        RCLCPP_WARN(node->get_logger(), "NaN value in elevation map at index (%d, %d)", it.getUnwrappedIndex().x(), it.getUnwrappedIndex().y());
-      }
-      continue;
-    }
+    //   auto node = node_.lock();
+    //   if (node) {
+    //     RCLCPP_WARN(node->get_logger(), "NaN value in elevation map at index (%d, %d)", it.getUnwrappedIndex().x(), it.getUnwrappedIndex().y());
+    //   }
+    //   continue;
+    // }
 
     Eigen::Vector2d position;
     elevation_grid_.getPosition(*it, position);
@@ -257,12 +257,22 @@ void ElevationLayer::updateCosts(
       if (master_grid.worldToMap(position.x(), position.y(), mx, my)) {
         float normalized = (val - min_elev) / range;
         unsigned char cost = static_cast<unsigned char>(normalized * 255.0f);
-        master_grid.setCost(mx, my, cost);
+        // master_grid.setCost(mx, my, cost);
+
+        unsigned char old_cost = master_grid.getCost(mx, my);
+        // master_grid.setCost(mx, my, std::max(old_cost, cost));
+
+        unsigned char new_cost = old_cost + cost;
+        if(int(old_cost) + int(cost) > 254) {
+          new_cost = 254;
+        }
+        master_grid.setCost(mx, my, new_cost);
+
       }
     }
   }
 
-  data_ready_ = false;
+  // data_ready_ = false;
 }
 
 }  // namespace elevation_costmap_plugin
