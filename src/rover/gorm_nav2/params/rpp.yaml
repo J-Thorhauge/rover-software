@@ -141,7 +141,7 @@ local_costmap:
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
         cost_scaling_factor: 3.0
-        inflation_radius: 0.6  #This might seem high, but the maintainers of nav2 recommend a higher than expected inflation radius to create a smoother potential field 
+        inflation_radius: 0.45  #This might seem high, but the maintainers of nav2 recommend a higher than expected inflation radius to create a smoother potential field 
       voxel_layer:
         plugin: "nav2_costmap_2d::VoxelLayer"
         enabled: True
@@ -195,7 +195,7 @@ global_costmap:
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
         cost_scaling_factor: 3.0
-        inflation_radius: 0.6
+        inflation_radius: 0.45
       elevation_layer:
         plugin: "elevation_costmap_plugin/ElevationLayer"
       always_send_full_costmap: True
