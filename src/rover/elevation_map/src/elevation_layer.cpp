@@ -261,13 +261,16 @@ void ElevationLayer::updateCosts(
 
         unsigned char old_cost = master_grid.getCost(mx, my);
         // master_grid.setCost(mx, my, std::max(old_cost, cost));
-
-        unsigned char new_cost = old_cost + cost;
-        if(int(old_cost) + int(cost) > 254) {
-          new_cost = 254;
+        if (old_cost > 253) {
+          continue;
         }
-        master_grid.setCost(mx, my, new_cost);
-
+        else {
+          // unsigned char new_cost = old_cost + cost;
+          // if(int(old_cost)*0.5 + int(cost)*0.5 > 253) {
+          //   new_cost = 253;
+          // }
+          master_grid.setCost(mx, my, std::max(old_cost, cost));
+        }
       }
     }
   }
