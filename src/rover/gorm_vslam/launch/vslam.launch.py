@@ -5,12 +5,14 @@ from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, LogI
 from launch.substitutions import LaunchConfiguration, PythonExpression
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.substitutions import FindPackageShare
+from ament_index_python.packages import get_package_share_directory
 
 def generate_launch_description():
     # Launch configuration variables
     use_grayscale = LaunchConfiguration('use_grayscale')
     rgb_topic = LaunchConfiguration('rgb_topic')
     camera_info_topic = LaunchConfiguration('camera_info_topic')
+
 
 
 
@@ -40,17 +42,29 @@ def generate_launch_description():
             os.path.join(rtabmap_launch_dir, 'launch', 'rtabmap.launch.py')
         ),
         launch_arguments={
+            'rgbd_cameras': '2',
             'compressed': 'true',
             'rtabmap_args': "--delete_db_on_start ",
 
-            #'stereo': 'true', #save this for comparison in report
+            # 'stereo': 'true', #save this for comparison in report
+            # 'left_image_topic': left_image,
+            # 'right_image_topic': right_image,
+            # 'left_camera_info_topic': left_info,
+            # 'right_camera_info_topic': right_info,
+
+
             'visual_odometry': 'true',
             'icp_odometry': 'false',
             
-
+            #Front camera:
             'rgb_topic': rgb_topic,
             'depth_topic': '/zed_front/zed/depth/depth_registered',
+            'depth'
             'camera_info_topic': camera_info_topic,
+
+            #Back camera:
+
+
             'publish_tf':'true',
             'publish_tf_map':'True',
             'publish_tf_odom':'True',
