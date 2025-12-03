@@ -1,17 +1,38 @@
 import os
+import yaml
 from launch import LaunchDescription
 from launch_ros.actions import Node
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, LogInfo, TimerAction
 from launch.substitutions import LaunchConfiguration, PythonExpression
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.substitutions import FindPackageShare
+from ament_index_python.packages import get_package_share_directory
 
 def generate_launch_description():
     # Launch configuration variables
+    localization = LaunchConfiguration('localization')
+    rtabmap_args = LaunchConfiguration('rtabmap_args')
     use_grayscale = LaunchConfiguration('use_grayscale')
     rgb_topic = LaunchConfiguration('rgb_topic')
     camera_info_topic = LaunchConfiguration('camera_info_topic')
 
+    config_file = os.path.join(
+    FindPackageShare('gorm_vslam').find('gorm_vslam'),
+    'config',
+    'rtabmap_params.yaml'
+    )
+    
+    #Open the config files
+    with open(config_file,'r') as file:
+        loaded_parameters = yaml.safe_load(file)
+    #Standard ros2 config files are nested so we grab just the ros parameters to ensure we get the correct data form
+    launch_args = loaded_parameters["rtabmap"]["ros__parameters"]
+
+    
+    # Add flexible launch configurations
+    launch_args['rviz'] = LaunchConfiguration('rviz')
+    launch_args['rtabmap_viz'] = LaunchConfiguration('rtabmap_viz')
+    #launch_args['localization'] = LaunchConfiguration('localization')
 
 
 
@@ -39,35 +60,7 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(
             os.path.join(rtabmap_launch_dir, 'launch', 'rtabmap.launch.py')
         ),
-        launch_arguments={
-            'compressed': 'true',
-            'rtabmap_args': "--delete_db_on_start ",
-
-            #'stereo': 'true', #save this for comparison in report
-            'visual_odometry': 'true',
-            'icp_odometry': 'false',
-            
-
-            'rgb_topic': rgb_topic,
-            'depth_topic': '/zed_front/zed/depth/depth_registered',
-            'camera_info_topic': camera_info_topic,
-            'publish_tf':'true',
-            'publish_tf_map':'True',
-            'publish_tf_odom':'True',
-            'frame_id': 'base_link',
-            'odom_frame_id': 'odom',
-            'map_frame_id': 'map',
-            #'localization': 'false',
-            #'database_path': map_db_path,
-            'approx_sync': 'true',
-            'use_sim_time': 'false',
-            'qos': '1',
-            'topic_queue_size': '100',
-            'sync_queue_size': '300',
-
-            'rviz': LaunchConfiguration('rviz'),
-            'rtabmap_viz': LaunchConfiguration('rtabmap_viz')
-        }.items()
+        launch_arguments=launch_args.items()
     )
 
     # Delay RTAB-Map launch to allow camera initialization
@@ -110,6 +103,7 @@ def generate_launch_description():
         DeclareLaunchArgument('rviz', default_value='true', description='Launch RVIZ (optional).'),
         DeclareLaunchArgument('localization', default_value='false', description='Launch in localization mode.'),
         DeclareLaunchArgument('use_grayscale', default_value='false', description='Use grayscale input images'),
+       
 
         # Conditionally set topics based on grayscale flag
         DeclareLaunchArgument(
@@ -125,6 +119,15 @@ def generate_launch_description():
                 "\"/zed_front/zed/rgb_gray/camera_info\" if '", use_grayscale, "' == 'true' else \"/zed_front/zed/rgb/camera_info\""
             ]),
             description='Camera info topic'
+        ),
+
+        #Conditionally set if rtabmap.db should be deleted.
+        DeclareLaunchArgument(
+            'rtabmap_args',
+            default_value=PythonExpression([
+                "\"--delete_db_on_start\" if '",localization, "'=='false' else ''"
+            ]),
+            description ='Deletes the previous map if localization is off'
         ),
 
         
