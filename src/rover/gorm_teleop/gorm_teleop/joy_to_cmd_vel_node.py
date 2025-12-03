@@ -2,6 +2,7 @@
 
 import rclpy
 from rclpy.node import Node
+from std_srvs.srv import Trigger
 from sensor_msgs.msg import Joy
 from geometry_msgs.msg import Twist
 import math
@@ -17,7 +18,7 @@ class JoyToVelNode(Node):
 
         joy_topic = self.get_parameter('joy_topic').get_parameter_value().string_value
         twist_topic = self.get_parameter('twist_topic').get_parameter_value().string_value
-        
+
         # Subscriber
         self.subscription = self.create_subscription(
             Joy,
@@ -31,12 +32,26 @@ class JoyToVelNode(Node):
             twist_topic,
             10)
         
+
+        # Service clients
+        self.start_motors_client = self.create_client(Trigger, 'start_motors')
+        self.shutdown_motors_client = self.create_client(Trigger, 'shutdown_motors')
+
+        
         self.linear_vel = 0.0
         self.angular_vel = 0.0
         self.speed_multi = 1
         self.active_state = True
 
         self.pt_adjustment = 0.5 # Point turn adjustment factor
+
+
+        # Wait for services to be available
+        while not self.start_motors_client.wait_for_service(timeout_sec=1.0):
+            self.get_logger().info('Waiting for start_motors service...')
+        while not self.shutdown_motors_client.wait_for_service(timeout_sec=1.0):
+            self.get_logger().info('Waiting for shutdown_motors service...')
+
 
         self.get_logger().info(f"Joy to vel converter node started. Subscribing to '{joy_topic}' and publishing to '{twist_topic}'.")
 
@@ -51,7 +66,14 @@ class JoyToVelNode(Node):
 
         self.speed_multi = self.check_ABXY_pressed(msg)
         self.active_state = self.check_start_back(msg)
-   
+
+        # Check D-pad up/down
+        dpad_vertical = msg.axes[7]  
+        if dpad_vertical == 1.0:  # D-pad UP
+            self.call_start_motors()
+        elif dpad_vertical == -1.0:  # D-pad DOWN
+            self.call_shutdown_motors()
+
 
         # Strech the circle to a square
         linear_vel, angular_vel = self.circle_to_square(linear_vel, angular_vel)
@@ -102,6 +124,16 @@ class JoyToVelNode(Node):
         elif msg.buttons[7]==1:
             return True
         return self.active_state
+
+
+    def call_start_motors(self):
+        req = Trigger.Request()
+        self.start_motors_client.call_async(req)
+
+    def call_shutdown_motors(self):
+        req = Trigger.Request()
+        self.shutdown_motors_client.call_async(req)
+
 
     def circle_to_square(self, x, y):
         # Ensure the point (x, y) lies within the unit circle

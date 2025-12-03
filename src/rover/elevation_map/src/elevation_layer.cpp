@@ -256,7 +256,7 @@ void ElevationLayer::updateCosts(
        last_min_y_ <= position.y() && position.y() <= last_max_y_) {
       if (master_grid.worldToMap(position.x(), position.y(), mx, my)) {
         float normalized = (val - min_elev) / range;
-        unsigned char cost = static_cast<unsigned char>(normalized * 255.0f);
+        unsigned char cost = static_cast<unsigned char>(normalized * 253.0f);
         // master_grid.setCost(mx, my, cost);
 
         unsigned char old_cost = master_grid.getCost(mx, my);
