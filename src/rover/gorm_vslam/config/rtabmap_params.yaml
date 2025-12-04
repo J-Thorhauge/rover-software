@@ -31,7 +31,7 @@ rtabmap:
     sync_queue_size: '300'
 
     # rtabmap arguments These are important for localization mode, remove --delete_db_on_start if in localization mode
-    # rtabmap_args: "--delete_db_on_start"
-    # localization: 'true'
-    #database_path: '~/.ros/inside_recording.db'
+    rtabmap_args: "--delete_db_on_start"
+    localization: 'false'
+    #database_path: '~/.ros/rtabmap.db'
 

@@ -185,7 +185,7 @@ services:
 
 
 ###################################
-###         Navigation          ###
+###            V-slam           ###
 ###################################
 
   vslam-deploy:
@@ -235,7 +235,9 @@ services:
     entrypoint: ["/bin/bash"]
     command: ["-c", "source /opt/ros/humble/setup.bash && source /home/workspace/install/setup.bash && ros2 launch gorm_vslam vslam.launch.py rviz:=false rtabmap_viz:=false"]
 
-
+###################################
+###         Navigation          ###
+###################################
 
   nav2-deploy:
     build:

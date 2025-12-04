@@ -9,9 +9,11 @@ from launch_ros.substitutions import FindPackageShare
 from ament_index_python.packages import get_package_share_directory
 
 def generate_launch_description():
-    # Launch configuration variables
-    localization = LaunchConfiguration('localization')
-    rtabmap_args = LaunchConfiguration('rtabmap_args')
+    # Launch configuration variables:
+    #localization = LaunchConfiguration('localization')
+    #rtabmap_args = LaunchConfiguration('rtabmap_args')
+
+
     use_grayscale = LaunchConfiguration('use_grayscale')
     rgb_topic = LaunchConfiguration('rgb_topic')
     camera_info_topic = LaunchConfiguration('camera_info_topic')
@@ -25,7 +27,7 @@ def generate_launch_description():
     #Open the config files
     with open(config_file,'r') as file:
         loaded_parameters = yaml.safe_load(file)
-    #Standard ros2 config files are nested so we grab just the ros parameters to ensure we get the correct data form
+    #Standard ros2 config files are nested so we grab just the ros parameters to ensure we get the correct data structure
     launch_args = loaded_parameters["rtabmap"]["ros__parameters"]
 
     
@@ -101,7 +103,7 @@ def generate_launch_description():
         # Declare launch arguments
         DeclareLaunchArgument('rtabmap_viz', default_value='true', description='Launch RTAB-Map UI (optional).'),
         DeclareLaunchArgument('rviz', default_value='true', description='Launch RVIZ (optional).'),
-        DeclareLaunchArgument('localization', default_value='false', description='Launch in localization mode.'),
+        #DeclareLaunchArgument('localization', default_value='false', description='Launch in localization mode.'),
         DeclareLaunchArgument('use_grayscale', default_value='false', description='Use grayscale input images'),
        
 
@@ -121,14 +123,14 @@ def generate_launch_description():
             description='Camera info topic'
         ),
 
-        #Conditionally set if rtabmap.db should be deleted.
-        DeclareLaunchArgument(
-            'rtabmap_args',
-            default_value=PythonExpression([
-                "\"--delete_db_on_start\" if '",localization, "'=='false' else ''"
-            ]),
-            description ='Deletes the previous map if localization is off'
-        ),
+        #Conditionally set if rtabmap.db should be deleted. (we save this code but the functionality is move)
+        # DeclareLaunchArgument(
+        #     'rtabmap_args',
+        #     default_value=PythonExpression([
+        #         "\"--delete_db_on_start\" if '",localization, "'=='false' else ''"
+        #     ]),
+        #     description ='Deletes the previous map if localization is off'
+        # ),
 
         
         # Print selected topics
