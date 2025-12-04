@@ -248,26 +248,47 @@ RUN apt-get update && \
 RUN mkdir -p /home/workspace
 
 # Copy the source code
-COPY ./src /home/workspace/src
+
+COPY ./src/grid_map /home/workspace/src/grid_map
 
 # Set working directory
 WORKDIR /home/workspace
 
+RUN /bin/bash -c "apt-get update && \
+    source /opt/ros/humble/setup.bash && \
+    source ${ROS2_WRAPPER_FOLDER}/install/setup.bash && \
+    rosdep update && \
+    rosdep install --from-paths src --ignore-src -r -y --rosdistro humble"  
+
+
+RUN /bin/bash -c "source /opt/ros/humble/setup.bash && \
+    source ${ROS2_WRAPPER_FOLDER}/install/setup.bash && \ 
+    colcon build --packages-select grid_map_cmake_helpers grid_map_core grid_map_cv grid_map_filters grid_map_msgs grid_map_ros  \
+    --parallel-workers $(nproc) \
+    --event-handlers console_direct+ \
+    --cmake-args ' -DCMAKE_BUILD_TYPE=Release' \
+    ' --no-warn-unused-cli'"
+
+COPY ./src/rover /home/workspace/src/rover
+COPY ./src/manipulator /home/workspace/src/manipulator
 # Install dependencies for the rover software
 RUN /bin/bash -c "apt-get update && \
     source /opt/ros/humble/setup.bash && \
     source ${ROS2_WRAPPER_FOLDER}/install/setup.bash && \
     rosdep update && \
-    rosdep install --from-paths src --ignore-src -r -y --rosdistro humble"
+    rosdep install --from-paths src --ignore-src -r -y --rosdistro humble"  
+
 
 # Build the rover software
 RUN /bin/bash -c "source /opt/ros/humble/setup.bash && \
-    source ${ROS2_WRAPPER_FOLDER}/install/setup.bash && \
-    colcon build --packages-ignore interfaces probe_detection \ 
+    source /home/workspace/install/setup.bash && \
+    colcon build --packages-ignore interfaces probe_detection grid_map_cmake_helpers grid_map_core grid_map_cv grid_map_filters grid_map_msgs grid_map_ros \ 
     --parallel-workers $(nproc) \
     --event-handlers console_direct+ \
     --cmake-args ' -DCMAKE_BUILD_TYPE=Release' \
     ' --no-warn-unused-cli'"
+
+
 
 # Copy unified entrypoint script
 COPY docker/entrypoint.sh /entrypoint.sh
