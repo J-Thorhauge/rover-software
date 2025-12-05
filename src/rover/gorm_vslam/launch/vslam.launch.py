@@ -78,6 +78,73 @@ def generate_launch_description():
         output='screen'
     )
 
+
+    vslam_config_folder = os.path.join(get_package_share_directory("gorm_vslam"), "config")
+    map_alignment_path = os.path.join(vslam_config_folder, "map_alignment.yaml")
+
+    
+    # aligner_node = Node(
+    #     package='gorm_vslam', 
+    #     executable='world_map_aligner.py',
+    #     name='world_map_aligner',
+    #     output='screen',
+    #     parameters=[map_alignment_path],
+    #     # Env var helpful to see TF warnings/time sync
+    #     emulate_tty=True,
+    # )
+
+
+    aligner_node = Node(
+        package='gorm_mapping',
+        executable='world_map_aligner',
+        name='world_map_aligner',
+        output='screen',
+        # If you use a YAML file:
+        #['/home/jonas/rover-software/src/rover/gorm_mapping/config/map_alignment.yaml'],
+        # parameters=[map_alignment_path],
+        parameters=[{   # [map_alignment_path] if map_alignment_path.perform(None) != '' else 
+            # Inline parameters (works without YAML; adjust as needed)
+            'world_frame': 'world',
+            'map_frame': 'map',
+            'marker_frame_prefix': 'aruco_marker_',
+            'min_markers': 2,
+            'recompute': True,
+            'timer_period': 1.0,
+            'known_markers_json': '{"51":{"x":0.5,"y":3.0},"52":{"x":0.5,"y":6.0},"53":{"x":-1.0,"y":6.0},"54":{"x":-0.5,"y":9.0},"55":{"x":0.5,"y":12.0},"56":{"x":0.0,"y":13.0}}'
+            # 'known_markers_json': '{"1":{"x":2.0,"y":0.5},"2":{"x":5.0,"y":0.5},"7":{"x":2.0,"y":3.0}}'
+            # 'known_markers': {
+            #     '1': {'x': 2.0, 'y': 0.5},
+            #     '2': {'x': 5.0, 'y': 0.5},
+            #     '7': {'x': 2.0, 'y': 3.0},
+            # },
+        }],
+        # Env var helpful to see TF warnings/time sync
+        emulate_tty=True,
+    )
+
+
+
+    aruco_tf_node = Node(
+            package='gorm_mapping',
+            executable='aruco_tf_node',
+            name='aruco_tf_node',
+            output='screen',
+            parameters=[{
+                'image_topic': '/zed_front/zed/rgb/image_rect_color/compressed',
+                'camera_info_topic': '/zed_front/zed/rgb/camera_info',
+                'marker_length': 0.15,
+                'dictionary': 'DICT_5X5_100',
+                'tf_prefix': '',
+                'child_frame_prefix': 'aruco_marker_',
+                'publish_debug_image': False,
+                'debug_image_topic': '/aruco/debug_image',
+                'use_image_header_stamp': True,
+            }]
+        )
+
+
+
+
     static_transform = Node(
     package='tf2_ros',
     executable='static_transform_publisher',
@@ -140,8 +207,10 @@ def generate_launch_description():
         ])),
 
         #static_transform,
-        rtabmap_launch,
-        pointcloud_converter,
+        # rtabmap_launch,
+        # pointcloud_converter,
         map_republisher,
-        delayed_actions
+        aligner_node,
+        aruco_tf_node
+        # delayed_actions
     ])

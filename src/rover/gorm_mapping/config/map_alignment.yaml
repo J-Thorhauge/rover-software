@@ -1,0 +1,12 @@
+
+world_map_aligner:
+  ros__parameters:
+    world_frame: "world"
+    map_frame: "dingus"
+    marker_frame_prefix: "aruco_marker_"
+    min_markers: 2
+    recompute: false   # set true to keep refreshing as you move or re-detect
+    known_markers:
+      "1": {x: 2.00, y: 0.50}
+      "2": {x: 5.00, y: 0.50}
+      "7": {x: 2.00, y: 3.00}
