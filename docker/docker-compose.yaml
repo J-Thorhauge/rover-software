@@ -213,6 +213,7 @@ services:
       - /tmp/.X11-unix/:/tmp/.X11-unix
       - /dev/shm:/dev/shm
       - ./configs/fastrtps-profiles.xml:/home/workspace/fastrtps-profiles.xml
+      - /home/gorm/workspace/p9_gorm_nav/rover-software/src/rover/gorm_vslam/rtab_map_db:/root/.ros/rtabmap
     working_dir: /home/workspace
     stdin_open: true
     tty: true
