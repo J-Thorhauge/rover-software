@@ -33,5 +33,5 @@ rtabmap:
     # rtabmap arguments These are important for localization mode, remove --delete_db_on_start if in localization mode
     rtabmap_args: "--delete_db_on_start"
     localization: 'false'
-    #database_path: '~/.ros/rtabmap.db'
+    database_path: '~/.ros/rtabmap.db'
 
