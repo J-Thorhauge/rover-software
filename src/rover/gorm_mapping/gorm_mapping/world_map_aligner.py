@@ -27,12 +27,14 @@ import math
 import numpy as np
 from typing import Dict, Tuple, List
 import json
+from collections import deque
 
 import rclpy
 from rclpy.node import Node
 from rclpy.duration import Duration
 
 from tf2_ros import Buffer, TransformListener, StaticTransformBroadcaster
+from visualization_msgs.msg import Marker, MarkerArray
 from geometry_msgs.msg import TransformStamped
 import tf_transformations as tft #sudo apt install ros-$ROSDISTRO-tf-transformations
 
@@ -119,8 +121,10 @@ class WorldMapAligner(Node):
         self.declare_parameter('marker_frame_prefix', 'aruco_marker_')
         self.declare_parameter('min_markers', 2)
         self.declare_parameter('recompute', False)
-        self.declare_parameter('timer_period', 1.0)
+        self.declare_parameter('timer_period', 0.5)
         self.declare_parameter('known_markers_json', '')
+        self.declare_parameter('smooth_window', 10)        # last N estimates to average
+        self.declare_parameter('show_known_markers', True)
 
         self.known_markers = load_known_markers(self)
 
@@ -134,19 +138,8 @@ class WorldMapAligner(Node):
         self.recompute = bool(self.get_parameter('recompute').get_parameter_value().bool_value)
         self.timer_period = float(self.get_parameter('timer_period').get_parameter_value().double_value)
 
-        # Do NOT declare known_markers with a {} default (Humble disallows dict defaults).
-        # Instead: only read it if present; otherwise use {}.
-        # if self.has_parameter('known_markers'):
-        #     km_param = self.get_parameter('known_markers')
-        #     val = km_param.value
-        #     if isinstance(val, dict):
-        #         self.known_markers = val
-        #     else:
-        #         self.get_logger().warn("Parameter 'known_markers' is not a dict; defaulting to empty.")
-        #         self.known_markers = {}
-        # else:
-        #     self.get_logger().warn("Parameter 'known_markers' not provided; defaulting to empty.")
-        #     self.known_markers = {}
+        self.smooth_window = int(self.get_parameter('smooth_window').get_parameter_value().integer_value)
+        self.show_known_markers = bool(self.get_parameter('show_known_markers').get_parameter_value().bool_value)
 
 
         # TF
@@ -156,8 +149,17 @@ class WorldMapAligner(Node):
 
         self._transform_published = False
 
+
+        # Rolling buffers for smoothing
+        self._tx_buf = deque(maxlen=self.smooth_window)
+        self._ty_buf = deque(maxlen=self.smooth_window)
+        self._yaw_buf = deque(maxlen=self.smooth_window)
+
+
         # Periodic compute
         self.timer = self.create_timer(self.timer_period, self.try_compute_and_publish)
+
+        self.pub_marker_array = self.create_publisher(MarkerArray, 'marker_array', 10)
 
         self.get_logger().info(f"[Aligner] world_frame='{self.world_frame}', map_frame='{self.map_frame}', "
                                f"marker_prefix='{self.marker_prefix}', min_markers={self.min_markers}, "
@@ -208,10 +210,43 @@ class WorldMapAligner(Node):
             return np.empty((0, 2)), np.empty((0, 2)), []
         return np.array(world_pts, dtype=np.float64), np.array(map_pts, dtype=np.float64), used_ids
 
+    def publish_markers(self):
+        if not self.show_known_markers:
+            return
+
+        marker_array = MarkerArray()
+        for mid, pos in self.known_markers.items():
+            marker = Marker()
+            marker.header.frame_id = self.world_frame
+            marker.header.stamp = self.get_clock().now().to_msg()
+            marker.ns = "known_markers"
+            marker.id = int(mid)
+            marker.type = Marker.CUBE
+            marker.action = Marker.ADD
+            marker.pose.position.x = float(pos['x'])
+            marker.pose.position.y = float(pos['y'])
+            marker.pose.position.z = 0.25
+            marker.pose.orientation.x = 0.0
+            marker.pose.orientation.y = 0.0
+            marker.pose.orientation.z = 0.0
+            marker.pose.orientation.w = 1.0
+            marker.scale.x = 0.1
+            marker.scale.y = 0.1
+            marker.scale.z = 0.5
+            marker.color.a = 1.0
+            marker.color.r = 0.0
+            marker.color.g = 1.0
+            marker.color.b = 0.0
+            marker_array.markers.append(marker)
+
+        self.pub_marker_array.publish(marker_array)
+
     def try_compute_and_publish(self):
         # Stop after publishing once unless recompute=True
         if self._transform_published and not self.recompute:
             return
+
+        self.publish_markers()
 
         world_pts, map_pts, used_ids = self.gather_correspondences()
 
@@ -230,18 +265,34 @@ class WorldMapAligner(Node):
             self.get_logger().error(f"[Aligner] Failed computing SE(2): {e}")
             return
 
+
+
+        yaw = math.atan2(R[1,0], R[0,0])
+        tx, ty = float(t[0]), float(t[1])
+
+        # Push into buffers
+        self._tx_buf.append(tx)
+        self._ty_buf.append(ty)
+        self._yaw_buf.append(yaw)
+
+        # Compute smoothed values
+        tx_s = float(np.mean(self._tx_buf))
+        ty_s = float(np.mean(self._ty_buf))
+        yaw_s = circular_mean(self._yaw_buf)
+
+
         # Build TransformStamped: parent=map, child=world
         T = TransformStamped()
         T.header.stamp = self.get_clock().now().to_msg()
         T.header.frame_id = self.map_frame
         T.child_frame_id = self.world_frame
 
-        T.transform.translation.x = float(t[0])
-        T.transform.translation.y = float(t[1])
+        T.transform.translation.x = tx_s
+        T.transform.translation.y = ty_s
         T.transform.translation.z = 0.0
 
         yaw = math.atan2(R[1, 0], R[0, 0])
-        qx, qy, qz, qw = tft.quaternion_from_euler(0.0, 0.0, yaw)
+        qx, qy, qz, qw = tft.quaternion_from_euler(0.0, 0.0, yaw_s)
         T.transform.rotation.x = qx
         T.transform.rotation.y = qy
         T.transform.rotation.z = qz
@@ -257,6 +308,15 @@ class WorldMapAligner(Node):
             f"  Translation t = [{t[0]:.3f}, {t[1]:.3f}] m, Yaw = {math.degrees(yaw):.2f}°\n"
             f"  RMS alignment error = {rms_err:.3f} m (lower is better)"
         )
+
+
+def circular_mean(yaws_rad) -> float:
+    """Compute circular mean of yaw angles (radians)."""
+    if len(yaws_rad) == 0:
+        return 0.0
+    s = sum(math.sin(a) for a in yaws_rad)
+    c = sum(math.cos(a) for a in yaws_rad)
+    return math.atan2(s, c)
 
 
 def main(args=None):
