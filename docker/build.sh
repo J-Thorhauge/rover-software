@@ -17,6 +17,7 @@ cd "$SCRIPT_DIR"
 docker compose --file docker-compose.yaml build rover-deploy
 docker compose --file docker-compose.yaml build camgnss-deploy
 docker compose --file docker-compose.yaml build vslam-deploy
+docker compose --file docker-compose.yaml build nav2-deploy
 
 echo "✅ Rover deployment image built successfully!"
 echo ""

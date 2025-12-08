@@ -1,45 +1,57 @@
-# AAU Space Robotics - System Setup Repository
-This repository contains the files and documentation for running the GORM rover software on the physical rover or in simulation.
+# AAU Space Robotics Navigation - System Setup Repository
+This repository is a fork from the main AAU Space Robotics repository.
+It was made with the intetntion of adding autonomous navigation and SLAM capabilities to the GORM rover while still being modular enough
+such that it could be utilized on other systems. 
 
+The original documentation site can be found at:
 Documentation site: https://aau-space-robotics.github.io/aau-rover/
 
-## Quick Start (Development)
 
-Use development mode when actively editing source and testing interactively. The `rover` service mounts your workspace for live editing.
+## Quick start (get the rover moving)
 
+Start by SSH'ing into the desired jetson orin and ensure that the current branch on it matches this branch.
+Run the following commands (note that a first-time build and run will take som time as it has to build some large packages from source)
 ```bash
-# from the repository root
-cd docker/
-./run.sh rover --dev          # start the development container (builds and mounts source)
+cd workspace/p9_dev/rover-software/docker/
+./build.sh  # This is only needed if no the containers havent been build before
+./run.sh rover --prod -z
+./run.sh camgnss --prod -z
+./run.sh vslam --prod -z
+./run.sh nav2 --prod -z
 
-# attach to the running container
-docker exec -it rover bash
-
-# inside the container (build and launch)
-colcon build
-source install/setup.bash
-ros2 launch gorm_bringup bringup_teleop.launch.py
+# Ensure that all of the containers are running
+docker ps
 ```
 
-Notes:
-- Container name: `rover` (development). Changes to source files on the host are visible inside the container.
-- Use `./stop.sh` or `docker compose -f docker/docker-compose.yaml down` to stop services.
 
-## Quick Start (Production)
+When the rover is fully set up the next step is setting up the ground control computer.
+The only prerequisites are that the ground control computer has ROS2 Humble and Nav2 installed
 
-For autonomous deployments, use the production image. The `rover-deploy` service is pre-built and runs continuously.
+Open a new terminal that is NOT connected to the rover
+First, setup zenoh on the ground control computer:
+```bash
+export RMW_IMPLEMENTATION=rmw_zenoh_cpp
+export ROS_DOMAIN_ID=50
+
+#You will need to download and unzip the rmw_zenoh_cpp.zip file and unzip it in a known location
+# Adapt the to your path:
+export ZENOH_ROUTER_CONFIG_URI= PATH/TO/YOUR/rmw_zenoh_cpp/config/routerconfig.json5
+
+# If using a previous DDS implementation, kill the ROS 2 daemon first
+pkill -9 -f ros && ros2 daemon stop
+
+# Then start the Zenoh RMW daemon
+ros2 run rmw_zenoh_cpp rmw_zenohd
+```
+In another terminal open up for rviz using the nav2 bringup
 
 ```bash
-cd docker/
-./build.sh                   # build the production image (if necessary)
-./run.sh rover --prod        # start the production deploy image (background)
-
-# view logs
-docker compose -f docker/docker-compose.yaml logs -f rover-deploy
-
-# access running container
-docker compose -f docker/docker-compose.yaml exec rover-deploy bash
+ros2 launch nav2_bringup rviz_launch.py
 ```
+You should now be able to send pose goals to the rover using rviz.
+
+
+
 
 Notes:
 - Container name: `rover-deploy` (production).
