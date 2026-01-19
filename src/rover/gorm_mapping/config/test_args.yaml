@@ -1,0 +1,13 @@
+
+world_map_aligner:
+  ros__parameters:
+    'world_frame': 'world'
+    'map_frame': 'map'
+    'marker_frame_prefix': 'aruco_marker_'
+    'min_markers': 2
+    'recompute': True
+    'timer_period': 1.0
+    # 'known_markers_json': '{"51":{"x":-1.5,"y":0.0},"52":{"x":2.0,"y":-0.8},"53":{"x":0.5,"y":8.0},"54":{"x":-1.5,"y":9.5},"55":{"x":2.0,"y":11.7},"56":{"x":6.5,"y":11.7},"57":{"x":9.0,"y":6.0},"58":{"x":13.0,"y":9.5},"59":{"x":13.0,"y":12.0},"60":{"x":8.5,"y":25.0},"61":{"x":11.5,"y":25.0}}'
+    'known_markers_json': '{"51":{"x":0.5,"y":-1.0},"52":{"x":0.5,"y":3.0},"53":{"x":-1.0,"y":3.0},"54":{"x":-0.5,"y":6.0},"55":{"x":0.5,"y":9.0},"56":{"x":0.0,"y":11.0}}'
+    'smooth_window': 10
+    'show_known_markers': True

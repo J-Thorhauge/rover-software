@@ -14,6 +14,7 @@ setup(
         ('share/' + package_name, ['package.xml']),
         ('share/' + package_name + '/launch', ['launch/aruco_alignment.launch.py']),
         ('share/' + package_name + '/config', ['config/map_alignment.yaml']),
+        ('share/' + package_name + '/config', ['config/test_args.yaml']),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
