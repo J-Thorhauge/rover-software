@@ -108,7 +108,7 @@ controller_server:
       use_velocity_scaled_lookahead_dist: false
       min_approach_linear_velocity: 0.5
       approach_velocity_scaling_dist: 0.0
-      use_collision_detection: true
+      use_collision_detection: false
       max_allowed_time_to_collision_up_to_carrot: 1.0
       use_regulated_linear_velocity_scaling: false
       use_fixed_curvature_lookahead: false
@@ -268,7 +268,7 @@ planner_server:
         tolerance: 1.0e-10
         do_refinement: true
         refinement_num: 2
-        
+
     Secondary_holonomic:
       plugin: 'nav2_navfn_planner/NavfnPlanner' # In Iron and older versions, "/" was used instead of "::"
       use_astar: True
