@@ -145,5 +145,5 @@ def generate_launch_description():
         rtabmap_launch,
         pointcloud_converter,
         map_republisher,
-        delayed_actions
+        # delayed_actions
     ])
