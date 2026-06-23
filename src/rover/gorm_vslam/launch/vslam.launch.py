@@ -41,7 +41,7 @@ def generate_launch_description():
     # RTAB-Map launch directory
     rtabmap_launch_dir = FindPackageShare('rtabmap_launch').find('rtabmap_launch')
 
-    map_db_path ='/home/roy/Documents/vslam_maps/inside_recording.db'
+    map_db_path ='/home/roy/Documents/vslam_maps/inside_recording.db' # This is no good
 
     stereo_namespace = '/zed_front/zed'
     left_image = f'{stereo_namespace}/left/image_rect_color'
@@ -73,12 +73,12 @@ def generate_launch_description():
         ]
     )
 
-    pointcloud_converter = Node(
-        package='elevation_map',
-        executable='pointcloud_converter',
-        name='pointcloud_converter',
-        output='screen'
-    )
+    # pointcloud_converter = Node(
+    #     package='elevation_map',
+    #     executable='pointcloud_converter',
+    #     name='pointcloud_converter',
+    #     output='screen'
+    # )
 
     static_transform = Node(
     package='tf2_ros',
@@ -143,7 +143,7 @@ def generate_launch_description():
 
         #static_transform,
         rtabmap_launch,
-        pointcloud_converter,
+        # pointcloud_converter,
         map_republisher,
         # delayed_actions
     ])
