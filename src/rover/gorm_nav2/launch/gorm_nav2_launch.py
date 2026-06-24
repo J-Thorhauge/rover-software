@@ -14,6 +14,12 @@ def generate_launch_description():
         'navigation_launch.py'
     )
 
+    aruco_bringup_path = os.path.join(
+        FindPackageShare('gorm_mapping').find('gorm_mapping'),
+        'launch',
+        'aruco_alignment.launch.py'
+    )
+
     yaml_name_arg = DeclareLaunchArgument(
         'config',
         default_value='rpp.yaml',
@@ -54,7 +60,12 @@ def generate_launch_description():
         }.items()
     )
 
+    aruco_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(aruco_bringup_path),
+    )
+
     return LaunchDescription([
         yaml_name_arg,
-        nav2_launch
+        nav2_launch,
+        aruco_launch
     ])

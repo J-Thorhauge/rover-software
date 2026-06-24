@@ -68,5 +68,5 @@ def generate_launch_description():
         LogInfo(msg='Launching Aruco-based Map Aligner'),
         aligner_node,
         aruco_tf_front_node,
-        aruco_tf_back_node
+        # aruco_tf_back_node
     ])
