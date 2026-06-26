@@ -12,9 +12,19 @@
   <depend>std_msgs</depend>
   <depend>sensor_msgs</depend>
   <depend>nav_msgs</depend>
-  <depend>tf2_msgs</depend>
   <depend>nav2_msgs</depend>
   <depend>cv_bridge</depend>
+  
+  <depend>rmw-zenoh-cpp</depend>
+  <depend>tf2_msgs</depend>
+  <depend>tf2-geometry-msgs</depend>
+  <depend>tf2-ros</depend>
+  <depend>tf-transformations</depend>
+  <depend>image-transport</depend>
+  <depend>image-transport-plugins</depend>
+  <depend>image-pipeline</depend>
+  <depend>camera-info-manager</depend>
+  <depend>camera-info-manager-py</depend>
 
   <exec_depend>python3-opencv</exec_depend>
 

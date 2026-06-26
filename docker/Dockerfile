@@ -45,8 +45,8 @@ RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/r
 RUN apt update && apt upgrade -y && \
     apt install ros-humble-desktop -y
 
-# Install OpenCV and pip3
-RUN apt-get update && apt-get install -y python3-opencv libopencv-dev python3-pip
+# Install pip3 
+RUN apt-get update && apt-get install -y python3-pip
 
 #####################################
 ###         Install PyTorch       ###

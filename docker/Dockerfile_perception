@@ -181,6 +181,7 @@ RUN apt-get update && \
 # Install ultralytics and opencv-python
 RUN pip3 install --no-cache-dir --no-deps ultralytics   
 RUN pip3 install --no-cache-dir opencv-python>=4.6.0
+RUN apt-get update && apt-get install -y python3-opencv libopencv-dev python3-pip
 
 COPY src/ src/
 
