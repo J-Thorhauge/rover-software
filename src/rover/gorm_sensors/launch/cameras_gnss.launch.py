@@ -12,30 +12,30 @@ from launch.substitutions import LaunchConfiguration, Command
 def generate_launch_description():
     ld = LaunchDescription()
 
-    zed_tracking = TimerAction(
-        period=20.0,  # Delay in seconds
-        actions=[
-            IncludeLaunchDescription(
-                PythonLaunchDescriptionSource([
-                    FindPackageShare('gorm_sensors'), '/launch/zed_camera.launch.py'
-                ]),
-                launch_arguments={
-                    'camera_model': 'zed2i',
-                    'serial_number': '37915676',
-                    'camera_id': '0',
-                    'node_name': 'zed_tracking',
-                    'grab_resolution': 'HD720',
-                    'gnss_fusion_enabled': 'true',
-                    'namespace': 'zed_tracking',
-                    'initial_base_pose': '[0.28, 0.0, 0.225, 0.0, 0.0, 0.0]',
-                    'pos_tracking': 'true',
-                    'publish_tf': 'true',
-                    'publish_imu_tf': 'true',
-                    'publish_map_tf': 'true',
-                }.items()
-            )
-        ]
-    )
+    # zed_tracking = TimerAction(
+    #     period=20.0,  # Delay in seconds
+    #     actions=[
+    #         IncludeLaunchDescription(
+    #             PythonLaunchDescriptionSource([
+    #                 FindPackageShare('gorm_sensors'), '/launch/zed_camera.launch.py'
+    #             ]),
+    #             launch_arguments={
+    #                 'camera_model': 'zed2i',
+    #                 'serial_number': '37915676',
+    #                 'camera_id': '0',
+    #                 'node_name': 'zed_tracking',
+    #                 'grab_resolution': 'HD720',
+    #                 'gnss_fusion_enabled': 'true',
+    #                 'namespace': 'zed_tracking',
+    #                 'initial_base_pose': '[0.28, 0.0, 0.225, 0.0, 0.0, 0.0]',
+    #                 'pos_tracking': 'true',
+    #                 'publish_tf': 'true',
+    #                 'publish_imu_tf': 'true',
+    #                 'publish_map_tf': 'true',
+    #             }.items()
+    #         )
+    #     ]
+    # )
 
     zed_front = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
@@ -46,6 +46,7 @@ def generate_launch_description():
             'serial_number': '35803121',
             'camera_id': '1',
             'node_name': 'zed_front',
+            'camera_name': 'zed_front',
             'grab_resolution': 'HD1080', # 'VGA',  # The native camera grab resolution. 'HD2K', 'HD1080', 'HD720', 'VGA', 'AUTO'
             'gnss_fusion_enabled': 'true',
             'pos_tracking': 'false',  # Enable positional tracking
@@ -65,6 +66,25 @@ def generate_launch_description():
         # Note: yaw, pitch, roll are in radians!
     )
 
+    zed_back = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            FindPackageShare('gorm_sensors'), '/launch/zed_camera.launch.py'
+        ]),
+        launch_arguments={
+            'camera_model': 'zed2i',
+            'serial_number': '35803121',
+            'camera_id': '2',
+            'node_name': 'zed_back',
+            'camera_name': 'zed_back',
+            'grab_resolution': 'HD1080', # 'VGA',  # The native camera grab resolution. 'HD2K', 'HD1080', 'HD720', 'VGA', 'AUTO'
+            'gnss_fusion_enabled': 'true',
+            'pos_tracking': 'false',  # Enable positional tracking
+            'publish_tf': 'true',  # Publish TF for the camera
+            'publish_imu_tf': 'true',
+            'publish_map_tf': 'false',  # Publish map TF for the camera
+            'namespace': 'zed_back',  # Namespace for the camera node
+        }.items()
+    )
     static_tf_node_b = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
@@ -106,7 +126,8 @@ def generate_launch_description():
     ld.add_action(static_tf_node_f)
     ld.add_action(static_tf_node_b)
     ld.add_action(static_tf_node_c)
-    ld.add_action(zed_tracking)
+    # ld.add_action(zed_tracking)
     ld.add_action(zed_front)
+    ld.add_action(zed_back)
     ld.add_action(ublox_gps_node)
     return ld
