@@ -37,7 +37,7 @@ def generate_launch_description():
                 'tf_prefix': '',
                 'child_frame_prefix': 'aruco_marker_',
                 'publish_debug_image': False,
-                'debug_image_topic': '/aruco/debug_image',
+                'debug_image_topic': '/aruco/debug_image_front',
                 'use_image_header_stamp': True,
             }]
         )
@@ -48,14 +48,14 @@ def generate_launch_description():
             name='aruco_tf_back_node',
             output='screen',
             parameters=[{
-                'image_topic': '/zed_tracking/zed_back/rgb/image_rect_color/compressed',
-                'camera_info_topic': '/zed_tracking/zed_back/rgb/camera_info',
+                'image_topic': '/zed_back/zed_back/rgb/image_rect_color/compressed',
+                'camera_info_topic': '/zed_back/zed_back/rgb/camera_info',
                 'marker_length': 0.15,
                 'dictionary': 'DICT_5X5_100',
                 'tf_prefix': '',
                 'child_frame_prefix': 'aruco_marker_',
                 'publish_debug_image': False,
-                'debug_image_topic': '/aruco/debug_image',
+                'debug_image_topic': '/aruco/debug_image_back',
                 'use_image_header_stamp': True,
             }]
         )
@@ -68,5 +68,5 @@ def generate_launch_description():
         LogInfo(msg='Launching Aruco-based Map Aligner'),
         aligner_node,
         aruco_tf_front_node,
-        # aruco_tf_back_node
+        aruco_tf_back_node
     ])

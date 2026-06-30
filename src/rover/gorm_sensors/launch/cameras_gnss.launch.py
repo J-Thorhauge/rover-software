@@ -130,9 +130,9 @@ def generate_launch_description():
     #     parameters=[params_file],
     # )
 
-    ld.add_action(static_tf_node_f)
-    ld.add_action(static_tf_node_b)
-    ld.add_action(static_tf_node_c)
+    # ld.add_action(static_tf_node_f)
+    # ld.add_action(static_tf_node_b)
+    # ld.add_action(static_tf_node_c)
     # ld.add_action(zed_tracking)
     ld.add_action(zed_front)
     ld.add_action(zed_back)
