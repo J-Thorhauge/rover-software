@@ -5,7 +5,7 @@
 
     <link name="chassis_link">
         <visual>
-            <origin rpy="0.0 0.0 1.571" xyz="-0.09256 0.0 0.2110" />
+            <origin xyz="-0.09256 0.0 0.2110" rpy="0.0 0.0 1.571" />
             <geometry>
                 <mesh filename="package://gorm_bringup/meshes/gorm_primitive.stl" />
             </geometry>
@@ -14,35 +14,48 @@
             </material>
         </visual>
         <collision>
-            <origin rpy="0 0 0" xyz="0 0 0" />
+            <origin xyz="0 0 0" rpy="0 0 0" />
             <geometry>
                 <mesh filename="package://gorm_bringup/meshes/gorm_primitive.stl" />
             </geometry>
         </collision>
     </link>
-
     <joint name="base_chassis" type="fixed">
-        <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.302" />
+        <origin xyz="0.0 0.0 0.302" rpy="0.0 0.0 0.0"/>
         <parent link="base_link" />
         <child link="chassis_link" />
     </joint>
 
-    <link name="zed_camera_link">
+    <link name="zed_front_camera_link">
     </link>
-
     <joint name="chassis_cam_front" type="fixed">
-        <origin rpy="0.0 0.2618 0.1222" xyz="0.280 -0.264 0.472" />
+        <origin xyz="0.280 -0.264 0.472" rpy="0.0 0.2618 0.1222" />
         <parent link="chassis_link" />
-        <child link="zed_camera_link" />
+        <child link="zed_front_camera_link" />
     </joint>
 
-    <link name="zed_camera_link_b">
+    <link name="zed_back_camera_link">
     </link>
-
     <joint name="chassis_cam_back" type="fixed">
-        <origin rpy="0.0 0.2618 3.2637" xyz="-0.282 0.264 0.340" />
+        <origin xyz="-0.330 0.105 0.225" rpy="0.0 0.0 3.1415" />
         <parent link="chassis_link" />
-        <child link="zed_camera_link_b" />
+        <child link="zed_back_camera_link" />
+    </joint>
+
+    <link name="event_camera_link">
+    </link>
+    <joint name="chassis_event_cam" type="fixed">
+        <origin xyz="0.280 -0.264 0.407" rpy="0.0 0.2618 0.1222" />
+        <parent link="chassis_link" />
+        <child link="event_camera_link" />
+    </joint>
+
+    <link name="livox_frame">
+    </link>
+    <joint name="chassis_lidar" type="fixed">
+        <origin xyz="0.340 0.244 0.538" rpy="3.14159 0.0 1.5708" />
+        <parent link="chassis_link" />
+        <child link="livox_frame" />
     </joint>
 
 </robot>
