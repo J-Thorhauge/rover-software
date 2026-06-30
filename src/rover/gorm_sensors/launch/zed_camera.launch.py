@@ -306,7 +306,7 @@ def launch_setup(context, *args, **kwargs):
                 'general.camera_id': camera_id,
                 'general.grab_resolution': grab_resolution,
                 'general.pub_downscale_factor': pub_downscale_factor,
-                'general.pub_frame_rate': pub_frame_rate
+                'general.pub_frame_rate': pub_frame_rate,
                 'pos_tracking.pos_tracking_enabled': pos_tracking,
                 'pos_tracking.publish_tf': publish_tf,
                 'pos_tracking.publish_map_tf': publish_map_tf,
