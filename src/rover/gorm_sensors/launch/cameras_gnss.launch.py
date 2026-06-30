@@ -49,6 +49,7 @@ def generate_launch_description():
             'camera_name': 'zed_front',
             'grab_resolution': 'HD1080', # 'VGA',  # The native camera grab resolution. 'HD2K', 'HD1080', 'HD720', 'VGA', 'AUTO'
             'pub_downscale_factor': '1.0',  # Downscale factor for the camera images
+            'pub_frame_rate': '15.0',  # Frame rate for the camera images
             'gnss_fusion_enabled': 'false',
             'pos_tracking': 'false',  # Enable positional tracking
             'publish_tf': 'false',  # Publish TF for the camera
@@ -82,6 +83,7 @@ def generate_launch_description():
                     'camera_name': 'zed_back',
                     'grab_resolution': 'HD720',  # Lower bandwidth than HD1080 during startup
                     'pub_downscale_factor': '1.0',  # Downscale factor for the camera images
+                    'pub_frame_rate': '15.0',  # Frame rate for the camera images
                     'gnss_fusion_enabled': 'false',
                     'pos_tracking': 'false',  # Enable positional tracking
                     'publish_tf': 'false',  # Publish TF for the camera

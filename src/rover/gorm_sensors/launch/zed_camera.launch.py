@@ -132,6 +132,7 @@ def launch_setup(context, *args, **kwargs):
     ## custom
     grab_resolution = LaunchConfiguration('grab_resolution')
     pub_downscale_factor = LaunchConfiguration('pub_downscale_factor')
+    pub_frame_rate = LaunchConfiguration('pub_frame_rate')
 
     node_log_type_val = node_log_type.perform(context)
     container_name_val = container_name.perform(context)
@@ -305,6 +306,7 @@ def launch_setup(context, *args, **kwargs):
                 'general.camera_id': camera_id,
                 'general.grab_resolution': grab_resolution,
                 'general.pub_downscale_factor': pub_downscale_factor,
+                'general.pub_frame_rate': pub_frame_rate
                 'pos_tracking.pos_tracking_enabled': pos_tracking,
                 'pos_tracking.publish_tf': publish_tf,
                 'pos_tracking.publish_map_tf': publish_map_tf,
@@ -488,6 +490,11 @@ def generate_launch_description():
                 'pub_downscale_factor',
                 default_value='1.0',
                 description='The factor by which to downscale the camera images. The default value is `2.0`. Note that the ZED X One cameras only support `HD1080` and `VGA` resolutions.'
+            ),
+            DeclareLaunchArgument(
+                'pub_frame_rate',
+                default_value='15.0',
+                description='The frame rate at which to publish the camera images. The default value is `15.0`. Note that the ZED X One cameras only support `HD1080` and `VGA` resolutions.'
             ),
             DeclareLaunchArgument(
                 'pos_tracking',
