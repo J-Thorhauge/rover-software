@@ -30,8 +30,8 @@ def generate_launch_description():
             name='aruco_tf_front_node',
             output='screen',
             parameters=[{
-                'image_topic': '/zed_front/zed/rgb/image_rect_color/compressed',
-                'camera_info_topic': '/zed_front/zed/rgb/camera_info',
+                'image_topic': '/zed_front/zed_front/rgb/image_rect_color/compressed',
+                'camera_info_topic': '/zed_front/zed_front/rgb/camera_info',
                 'marker_length': 0.15,
                 'dictionary': 'DICT_5X5_100',
                 'tf_prefix': '',
@@ -48,8 +48,8 @@ def generate_launch_description():
             name='aruco_tf_back_node',
             output='screen',
             parameters=[{
-                'image_topic': '/zed_tracking/zed/rgb/image_rect_color/compressed',
-                'camera_info_topic': '/zed_tracking/zed/rgb/camera_info',
+                'image_topic': '/zed_tracking/zed_back/rgb/image_rect_color/compressed',
+                'camera_info_topic': '/zed_tracking/zed_back/rgb/camera_info',
                 'marker_length': 0.15,
                 'dictionary': 'DICT_5X5_100',
                 'tf_prefix': '',

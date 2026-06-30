@@ -12,9 +12,9 @@ rtabmap:
     icp_odometry: 'false'
 
     # Front camera
-    rgb_topic: "/zed_front/zed/rgb/image_rect_color"
-    depth_topic: "/zed_front/zed/depth/depth_registered"
-    camera_info_topic: "/zed_front/zed/rgb/camera_info"
+    rgb_topic: "/zed_front/zed_front/rgb/image_rect_color"
+    depth_topic: "/zed_front/zed_front/depth/depth_registered"
+    camera_info_topic: "/zed_front/zed_front/rgb/camera_info"
 
     # TF
     publish_tf: 'true'

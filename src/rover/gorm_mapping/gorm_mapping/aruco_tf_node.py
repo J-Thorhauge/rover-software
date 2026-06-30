@@ -30,8 +30,8 @@ class ArucoTfNode(Node):
         self.bridge = CvBridge()
 
         # --- Parameters ---
-        self.declare_parameter('image_topic', '/zed_front/zed/rgb/image_rect_color/compressed')
-        self.declare_parameter('camera_info_topic', '/zed_front/zed/rgb/camera_info')
+        self.declare_parameter('image_topic', '/zed_front/zed_front/rgb/image_rect_color/compressed')
+        self.declare_parameter('camera_info_topic', '/zed_front/zed_front/rgb/camera_info')
         self.declare_parameter('marker_length', 0.15)   # meters
         self.declare_parameter('dictionary', 'DICT_5X5_100')
         self.declare_parameter('tf_prefix', '')
