@@ -131,6 +131,7 @@ def launch_setup(context, *args, **kwargs):
 
     ## custom
     grab_resolution = LaunchConfiguration('grab_resolution')
+    pub_downscale_factor = LaunchConfiguration('pub_downscale_factor')
 
     node_log_type_val = node_log_type.perform(context)
     container_name_val = container_name.perform(context)
@@ -303,13 +304,13 @@ def launch_setup(context, *args, **kwargs):
                 'general.serial_number': serial_number,
                 'general.camera_id': camera_id,
                 'general.grab_resolution': grab_resolution,
+                'general.pub_downscale_factor': pub_downscale_factor,
                 'pos_tracking.pos_tracking_enabled': pos_tracking,
                 'pos_tracking.publish_tf': publish_tf,
                 'pos_tracking.publish_map_tf': publish_map_tf,
                 'pos_tracking.initial_base_pose': initial_base_pose,
                 'sensors.publish_imu_tf': publish_imu_tf,
-                'gnss_fusion.gnss_fusion_enabled': enable_gnss
-
+                'gnss_fusion.gnss_fusion_enabled': enable_gnss,
 
                 
             }
@@ -357,7 +358,7 @@ def launch_setup(context, *args, **kwargs):
 def generate_launch_description():
     return LaunchDescription(
         [
-            # Declare launch arguments
+            # Declare launch arguments pub_downscale_factor: 2.0
             DeclareLaunchArgument(
                 'node_log_type',
                 default_value=TextSubstitution(text='both'),
@@ -482,6 +483,11 @@ def generate_launch_description():
                 'grab_resolution',
                 default_value='HD720',
                 description='The native camera grab resolution. It can be `HD2K`, `HD1080`, `HD720`, `VGA` or `AUTO`. The default value is `HD720`. Note that the ZED X One cameras only support `HD1080` and `VGA` resolutions.'
+            ),
+            DeclareLaunchArgument(
+                'pub_downscale_factor',
+                default_value='1.0',
+                description='The factor by which to downscale the camera images. The default value is `2.0`. Note that the ZED X One cameras only support `HD1080` and `VGA` resolutions.'
             ),
             DeclareLaunchArgument(
                 'pos_tracking',
